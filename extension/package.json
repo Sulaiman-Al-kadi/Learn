@@ -58,7 +58,9 @@
     "build": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --sourcemap",
     "watch": "npm run build -- --watch",
     "typecheck": "tsc --noEmit",
-    "package": "vsce package --no-dependencies"
+    "package": "vsce package --no-dependencies --allow-missing-repository",
+    "install-extension": "code --install-extension learn-lab-0.1.0.vsix --force",
+    "setup": "npm install && npm run build && npm run package && npm run install-extension"
   },
   "devDependencies": {
     "@types/node": "^22",

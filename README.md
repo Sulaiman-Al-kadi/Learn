@@ -2,6 +2,8 @@
 
 A personal learning system: lessons, quizzes, and exercises that are **checked automatically**.
 
+> **Cloned or forked this?** Build artifacts and dependencies aren't committed — see **[SETUP.md](SETUP.md)** for the one-time build/install steps before anything works.
+
 ## The curriculum
 
 **10 modules, 33 lessons, ~117 checkable items — from `Console.WriteLine` to a tested, secured, containerized .NET backend.** Full concept-by-concept map: **[ROADMAP.md](ROADMAP.md)**.
