@@ -1,0 +1,15 @@
+{
+  "files.readonlyInclude": {
+    "**/solution/**": true,
+    "**/starter/**": true,
+    "**/expected.txt": true,
+    "**/cases/**": true
+  },
+  "files.exclude": {
+    "**/bin": true,
+    "**/obj": true,
+    "extension/node_modules": true,
+    "extension/dist": true
+  },
+  "editor.formatOnSave": true
+}

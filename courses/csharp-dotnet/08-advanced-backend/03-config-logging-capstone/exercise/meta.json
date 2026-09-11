@@ -1,0 +1,1 @@
+{ "title": "Capstone: Notifier (Options + structured logging)", "check": "test", "student": ["Notifier.cs"] }

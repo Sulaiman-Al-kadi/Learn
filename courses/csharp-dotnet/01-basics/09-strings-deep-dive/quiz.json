@@ -1,0 +1,66 @@
+{
+  "title": "Quiz — Strings Deep Dive",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "What prints?",
+      "code": "string s = \"hello\";\ns.ToUpper();\nConsole.WriteLine(s);",
+      "options": ["HELLO", "hello", "Hello", "It does not compile"],
+      "answer": 1,
+      "explanation": "Strings are immutable. `s.ToUpper()` returns a new string, but it's discarded since it's never assigned to anything. `s` itself never changes. Needed: `s = s.ToUpper();`."
+    },
+    {
+      "type": "mcq",
+      "question": "What does `\"Hello, World!\".Substring(7, 5)` return?",
+      "options": ["\"World!\"", "\"World\"", "\" World\"", "\"orld!\""],
+      "answer": 1,
+      "explanation": "Index 7 is 'W'. The second argument is a COUNT of characters, not an end index — take 5 characters starting there: 'World'."
+    },
+    {
+      "type": "mcq",
+      "question": "What prints?",
+      "code": "string csv = \"a,b,,c\";\nstring[] parts = csv.Split(',');\nConsole.WriteLine(parts.Length);",
+      "options": ["3", "4", "2", "It does not compile"],
+      "answer": 1,
+      "explanation": "Split on every comma, including the one that creates an empty piece between 'b' and 'c': [\"a\", \"b\", \"\", \"c\"] — 4 elements. Use `StringSplitOptions.RemoveEmptyEntries` to drop the empty one."
+    },
+    {
+      "type": "mcq",
+      "question": "Which correctly checks for null-or-empty input?",
+      "options": [
+        "`input.IsNullOrEmpty()`",
+        "`string.IsNullOrEmpty(input)`",
+        "`input == null && input == \"\"`",
+        "`input.Length == 0`"
+      ],
+      "answer": 1,
+      "explanation": "`IsNullOrEmpty` is STATIC on `string` — you call it as `string.IsNullOrEmpty(input)`. Calling it as `input.IsNullOrEmpty()` would crash if `input` is null, since there'd be no object to call it on. `input.Length` also crashes if input is null."
+    },
+    {
+      "type": "mcq",
+      "question": "What does this print?",
+      "code": "bool ok = int.TryParse(\"abc\", out int n);\nConsole.WriteLine(ok);\nConsole.WriteLine(n);",
+      "options": ["True / (some number)", "False / 0", "It crashes", "It does not compile"],
+      "answer": 1,
+      "explanation": "TryParse never throws — it returns `false` when parsing fails, and sets the `out` parameter to the type's default (0 for int). This is why TryParse is safer than Parse for untrusted input."
+    },
+    {
+      "type": "mcq",
+      "question": "Why use `StringBuilder` instead of `+=` inside a loop that runs thousands of times?",
+      "options": [
+        "`+=` doesn't work inside loops",
+        "`StringBuilder` mutates in place; `+=` allocates a brand-new string every iteration, which is slow",
+        "They produce different results",
+        "`StringBuilder` is required by the compiler for loops"
+      ],
+      "answer": 1,
+      "explanation": "Strings are immutable, so every `+=` creates an entirely new string and copies everything so far into it — O(n²) work overall. `StringBuilder` keeps one growable buffer and appends into it."
+    },
+    {
+      "type": "tf",
+      "question": "`\"YES\" == \"yes\"` and `string.Equals(\"YES\", \"yes\", StringComparison.OrdinalIgnoreCase)` return the same result.",
+      "answer": false,
+      "explanation": "`==` is case-sensitive: `\"YES\" == \"yes\"` is `false`. The `OrdinalIgnoreCase` comparison explicitly ignores case, so it returns `true`. They disagree here — that's the whole reason the ignore-case overload exists."
+    }
+  ]
+}

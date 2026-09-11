@@ -1,0 +1,62 @@
+{
+  "title": "Quiz — Interfaces & Abstract Classes",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "What happens if `Duck` implements `IFlyable` but forgets to write a `Fly()` method?",
+      "options": ["Nothing — Fly() just does nothing at runtime", "A compile error — the contract is not fulfilled", "A runtime exception the first time Fly() is called", "IFlyable silently provides a default"],
+      "answer": 1,
+      "explanation": "An interface is a compile-time contract. If a class claims `: IFlyable` but doesn't implement everything the interface requires, the code doesn't compile at all."
+    },
+    {
+      "type": "mcq",
+      "question": "Which is true about a class's relationship to interfaces vs. base classes?",
+      "options": [
+        "A class can have one base class and implement multiple interfaces",
+        "A class can have multiple base classes but only one interface",
+        "A class can have multiple base classes and multiple interfaces",
+        "A class can have exactly one of either, never both"
+      ],
+      "answer": 0,
+      "explanation": "C# has single inheritance for classes (one base class only) but a class can implement as many interfaces as needed — `class Duck : Animal, IFlyable, ISwimmable` is valid."
+    },
+    {
+      "type": "mcq",
+      "question": "What's wrong with this?",
+      "code": "public abstract class Shape\n{\n    public abstract double Area();\n}\n\nShape s = new Shape();",
+      "options": ["Nothing, this is fine", "Abstract classes cannot be instantiated directly with `new`", "Area() needs a body", "Shape needs a constructor"],
+      "answer": 1,
+      "explanation": "`abstract` on a class means it can never be `new`'d directly — it exists only to be inherited from. Only a concrete (non-abstract) subclass that implements `Area()` can be instantiated."
+    },
+    {
+      "type": "mcq",
+      "question": "Two completely unrelated classes, `Invoice` and `Employee`, both need to be processed in the same loop and summed by an `Amount`. What's the right tool?",
+      "options": [
+        "Make Employee inherit from Invoice",
+        "Have both implement a shared interface, e.g. `IPayable`, with an `Amount` property",
+        "Use `object` and cast inside the loop",
+        "Copy the summing logic into both classes separately"
+      ],
+      "answer": 1,
+      "explanation": "This is precisely the case interfaces solve: unrelated classes sharing a capability (having a payable amount) without a forced inheritance relationship. `List<IPayable>` lets you treat both uniformly."
+    },
+    {
+      "type": "mcq",
+      "question": "In an abstract class, what's the difference between an `abstract` method and a `virtual` method?",
+      "options": [
+        "No difference",
+        "`abstract` has no body and FORCES every concrete subclass to override it; `virtual` has a default body and overriding is optional",
+        "`virtual` cannot be overridden at all",
+        "`abstract` methods can only exist in interfaces"
+      ],
+      "answer": 1,
+      "explanation": "`abstract` methods end with `;` (no implementation) and every non-abstract derived class MUST override them. `virtual` methods provide a working default that derived classes MAY override if they choose."
+    },
+    {
+      "type": "tf",
+      "question": "An interface can contain fields (like `private int _count;`).",
+      "answer": false,
+      "explanation": "Interfaces cannot hold fields or any storage — only member signatures (methods, properties, events) that implementing classes must provide. Fields are the implementing class's responsibility."
+    }
+  ]
+}

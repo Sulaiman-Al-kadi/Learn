@@ -1,0 +1,64 @@
+{
+  "title": "Quiz — Inheritance & Polymorphism",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "What prints?",
+      "code": "public class Animal\n{\n    public virtual string Speak() => \"...\";\n}\npublic class Dog : Animal\n{\n    public override string Speak() => \"Woof!\";\n}\n\nAnimal a = new Dog();\nConsole.WriteLine(a.Speak());",
+      "options": ["...", "Woof!", "It does not compile", "null"],
+      "answer": 1,
+      "explanation": "Even though the VARIABLE `a` is typed `Animal`, the OBJECT it refers to is actually a `Dog`. Calling a virtual/override method always runs the real object's version — that's polymorphism."
+    },
+    {
+      "type": "mcq",
+      "question": "What's wrong with this?",
+      "code": "public class Dog : Animal\n{\n    public string Speak() => \"Woof!\";\n}",
+      "options": [
+        "Nothing, this correctly overrides Speak",
+        "Without `override` (and `virtual` on the base), this HIDES Animal's Speak instead of overriding it — polymorphism won't apply",
+        "It doesn't compile",
+        "Dog can't have a method named Speak"
+      ],
+      "answer": 1,
+      "explanation": "Without `virtual` in the base and `override` here, this is a completely separate method that happens to share a name. Called through an `Animal`-typed reference, Animal's original Speak (or a compiler warning about hiding) applies, not Dog's — polymorphism breaks silently."
+    },
+    {
+      "type": "mcq",
+      "question": "Given `public class Animal { public Animal(string name) { ... } }`, what must `public class Dog : Animal` do?",
+      "options": [
+        "Nothing special — Dog automatically gets a parameterless constructor",
+        "Dog's constructor(s) must call `: base(name)` with a matching argument, since Animal has no parameterless constructor",
+        "Dog cannot inherit from Animal in this case",
+        "Dog must redeclare the `name` field itself"
+      ],
+      "answer": 1,
+      "explanation": "Since Animal only defines a constructor that takes a `string name`, there's no free parameterless one. Every Dog constructor must explicitly call `base(name)` (or another Animal constructor) to properly construct the inherited part."
+    },
+    {
+      "type": "mcq",
+      "question": "What does `protected` allow that `private` does not?",
+      "options": [
+        "Access from anywhere in the same project",
+        "Access from classes that inherit from this one",
+        "Access from any class in any project",
+        "Nothing — they're the same"
+      ],
+      "answer": 1,
+      "explanation": "`protected` members are visible to the declaring class AND any class that inherits from it, while remaining hidden from unrelated outside code. `private` is visible only inside the exact declaring class."
+    },
+    {
+      "type": "mcq",
+      "question": "What prints?",
+      "code": "List<Animal> zoo = new List<Animal> { new Dog(), new Cat() };\nforeach (Animal a in zoo)\n{\n    Console.WriteLine(a.Speak());\n}\n// (Dog.Speak returns \"Woof!\", Cat.Speak returns \"Meow!\", both override Animal's virtual Speak)",
+      "options": ["Woof!\\nMeow!", "...\\n...", "It does not compile — the list must be typed List<object>", "Woof!\\nWoof!"],
+      "answer": 0,
+      "explanation": "This is exactly the polymorphism pattern: a `List<Animal>` can hold any Animal subtype, and each call to the virtual `Speak()` runs the ACTUAL object's override — Dog's, then Cat's."
+    },
+    {
+      "type": "tf",
+      "question": "`base.Speak()` inside an override calls the derived class's own version again (infinite recursion).",
+      "answer": false,
+      "explanation": "`base.Speak()` explicitly calls the BASE class's implementation, skipping the override. It's how you extend behavior rather than fully replacing it, with no recursion."
+    }
+  ]
+}

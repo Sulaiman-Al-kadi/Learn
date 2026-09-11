@@ -1,0 +1,55 @@
+{
+  "title": "Quiz — Records & Value Equality",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "What prints?",
+      "code": "public class Point { public int X; public int Y; }\nvar a = new Point { X = 1, Y = 2 };\nvar b = new Point { X = 1, Y = 2 };\nConsole.WriteLine(a == b);",
+      "options": ["True", "False", "It does not compile", "null"],
+      "answer": 1,
+      "explanation": "A plain `class` uses reference equality by default: `==` asks 'are these the SAME object?', not 'do they hold the same data?'. Two separately-created objects are never `==`, regardless of their field values."
+    },
+    {
+      "type": "mcq",
+      "question": "What prints, using `public record Point(int X, int Y);` instead?",
+      "code": "var a = new Point(1, 2);\nvar b = new Point(1, 2);\nConsole.WriteLine(a == b);\nConsole.WriteLine(ReferenceEquals(a, b));",
+      "options": ["True / True", "False / False", "True / False", "False / True"],
+      "answer": 2,
+      "explanation": "Records compare by VALUE: same X and Y means `==` is True. But they are still two distinct objects in memory — `ReferenceEquals` is False. Value equality does not mean they're the same object."
+    },
+    {
+      "type": "mcq",
+      "question": "What's wrong with this?",
+      "code": "public record Point(int X, int Y);\nvar p = new Point(1, 2);\np.X = 5;",
+      "options": ["Nothing, it works", "Compile error — positional record properties are init-only, not settable after construction", "p.X = 5 silently does nothing", "Records don't have an X property"],
+      "answer": 1,
+      "explanation": "Properties generated from the positional syntax use `init`, not `set` — they can only be assigned during construction (including via `with`). Direct mutation afterward is a compile error, by design."
+    },
+    {
+      "type": "mcq",
+      "question": "What does `with` do?",
+      "code": "var original = new Point(1, 2);\nvar moved = original with { X = 10 };",
+      "options": [
+        "Mutates `original` in place, changing its X to 10",
+        "Creates a brand-new object copying all properties, except X which becomes 10; original is untouched",
+        "Throws an exception since Point is immutable",
+        "Makes `moved` and `original` reference the same object"
+      ],
+      "answer": 1,
+      "explanation": "`with` is non-destructive — it produces a NEW record, copying every property from the source except the ones you explicitly override. `original` still has X = 1 afterward."
+    },
+    {
+      "type": "mcq",
+      "question": "You're modeling a `BankAccount` whose balance changes over its lifetime and which has a distinct identity even if another account happens to have the same balance. Which should it be?",
+      "options": ["A `record`, for the free equality", "A `class`, because it has changing state and identity, not pure value semantics", "Either works identically", "A `record struct`"],
+      "answer": 1,
+      "explanation": "Two BankAccounts with the same balance are NOT the same account — they have separate identities. That's a `class` scenario (reference equality, mutable state), not a `record` scenario (value equality, immutable data)."
+    },
+    {
+      "type": "tf",
+      "question": "A `record` automatically gets a readable `ToString()` that shows its property values, unlike a plain `class`.",
+      "answer": true,
+      "explanation": "`Console.WriteLine(point)` on a record prints something like `Point { X = 1, Y = 2 }` automatically. A plain class without an overridden `ToString()` just prints its type name."
+    }
+  ]
+}

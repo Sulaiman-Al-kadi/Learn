@@ -1,0 +1,1 @@
+{ "title": "Exercise: Grade statistics", "check": "output", "student": ["Program.cs"], "input": "input.txt" }

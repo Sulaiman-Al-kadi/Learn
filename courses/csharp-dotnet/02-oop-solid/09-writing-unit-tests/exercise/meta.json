@@ -1,0 +1,1 @@
+{ "title": "Exercise: Write tests for Calculator", "check": "test", "student": ["CalculatorTests.cs"] }

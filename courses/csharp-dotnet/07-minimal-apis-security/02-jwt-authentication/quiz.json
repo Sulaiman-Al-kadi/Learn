@@ -1,0 +1,71 @@
+{
+  "title": "Quiz — JWT Authentication",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "What's the difference between authentication and authorization?",
+      "options": [
+        "They're the same thing",
+        "Authentication answers 'who are you?'; authorization answers 'are you allowed to do this?'",
+        "Authentication is for APIs, authorization is for websites",
+        "Authorization always happens before authentication"
+      ],
+      "answer": 1,
+      "explanation": "Authentication establishes identity (usually via login). Authorization is a separate decision made AFTER identity is known — whether that identified user can perform a specific action."
+    },
+    {
+      "type": "mcq",
+      "question": "Is the payload (claims) inside a JWT encrypted/secret?",
+      "options": [
+        "Yes, only the server can read it",
+        "No — it's just base64-encoded, readable by anyone; the SIGNATURE is what prevents tampering, not secrecy of the content",
+        "Yes, but only if HTTPS is used",
+        "JWTs don't have a payload"
+      ],
+      "answer": 1,
+      "explanation": "Anyone can decode a JWT's payload. Its security comes from the cryptographic signature, which proves the token was issued by someone holding the signing key and hasn't been altered — not from hiding the contents."
+    },
+    {
+      "type": "mcq",
+      "question": "In `app.UseAuthentication(); app.UseAuthorization();`, why must authentication be registered first?",
+      "options": [
+        "No particular reason, order doesn't matter",
+        "Authorization decisions ('are they allowed?') require knowing who the user is first — that's what authentication establishes",
+        "Authorization must always run before authentication",
+        "This is just a stylistic convention with no functional effect"
+      ],
+      "answer": 1,
+      "explanation": "This mirrors lesson 01's middleware order lesson: you can't decide what someone is allowed to do before you know who they are. Authentication must run first in the pipeline."
+    },
+    {
+      "type": "mcq",
+      "question": "What does `.RequireAuthorization()` on a Minimal API endpoint do?",
+      "options": [
+        "Nothing without more configuration",
+        "Rejects the request with 401 Unauthorized unless a valid token was presented",
+        "Requires the request body to contain a password",
+        "Only allows GET requests"
+      ],
+      "answer": 1,
+      "explanation": "RequireAuthorization() (and [Authorize] on MVC controllers) is the gate that returns 401 for any request lacking valid authentication credentials."
+    },
+    {
+      "type": "mcq",
+      "question": "What must be true for a server to accept a JWT as valid?",
+      "options": [
+        "The token must be encrypted",
+        "The token's signature must verify against the SAME signing key the server used when issuing tokens, and it must not be expired",
+        "The token must be exactly 100 characters",
+        "The client must also send the original password"
+      ],
+      "answer": 1,
+      "explanation": "Validation checks the signature (proving the token wasn't forged or tampered with, using the shared signing key) and the expiration claim — that's what ValidateIssuerSigningKey and ValidateLifetime configure."
+    },
+    {
+      "type": "tf",
+      "question": "The JWT signing key should be treated as a genuine secret and never hardcoded or committed to source control in a real application.",
+      "answer": true,
+      "explanation": "Anyone who obtains the signing key can forge valid tokens for any user — it must be kept as secret as a password, stored in configuration or a secrets manager, not committed to source control."
+    }
+  ]
+}

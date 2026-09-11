@@ -1,0 +1,50 @@
+{
+  "title": "Quiz — Reading Input",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "The user types `7` and presses Enter. What prints?",
+      "code": "string n = Console.ReadLine() ?? \"\";\nConsole.WriteLine(n + 3);",
+      "options": ["10", "73", "7 3", "It crashes"],
+      "answer": 1,
+      "explanation": "`ReadLine` returns a **string**. `\"7\" + 3` is string joining, not math — the 3 is converted to text and appended, giving `73`. To add numbers you need `int.Parse(n) + 3`."
+    },
+    {
+      "type": "mcq",
+      "question": "What does `int.Parse(\"abc\")` do?",
+      "options": [
+        "Returns 0",
+        "Returns -1",
+        "Throws a FormatException (the program crashes)",
+        "Returns the letters as numbers: 97, 98, 99"
+      ],
+      "answer": 2,
+      "explanation": "`Parse` demands valid number text. Anything else throws a `FormatException`. Later you'll use `int.TryParse` to check safely."
+    },
+    {
+      "type": "mcq",
+      "question": "What is the type returned by `Console.ReadLine()`?",
+      "options": ["`string`", "`string?` (a string that might be null)", "`int`", "`object`"],
+      "answer": 1,
+      "explanation": "It returns `string?` — usually a string, but `null` if the input stream is closed. That's why we write `?? \"\"` to supply a fallback."
+    },
+    {
+      "type": "mcq",
+      "question": "The user types `2.5`. Which line correctly stores it as a number?",
+      "options": [
+        "`int x = int.Parse(Console.ReadLine() ?? \"\");`",
+        "`double x = double.Parse(Console.ReadLine() ?? \"\");`",
+        "`double x = Console.ReadLine();`",
+        "`string x = double.Parse(Console.ReadLine() ?? \"\");`"
+      ],
+      "answer": 1,
+      "explanation": "`2.5` isn't a whole number, so `int.Parse` throws. `double.Parse` handles decimals. Option 3 puts a string into a double (error); option 4 puts a double into a string (error)."
+    },
+    {
+      "type": "tf",
+      "question": "`Console.Write(\"Name: \")` is better than `WriteLine` for a prompt because the user's typing appears on the same line.",
+      "answer": true,
+      "explanation": "Exactly — `Write` leaves the cursor right after the prompt text."
+    }
+  ]
+}

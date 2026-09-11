@@ -1,0 +1,1 @@
+{ "title": "Exercise: JWT-protected TaskApi", "check": "test", "student": ["App/Program.cs"] }

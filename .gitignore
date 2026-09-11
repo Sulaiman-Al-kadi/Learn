@@ -1,0 +1,6 @@
+bin/
+obj/
+.learn/
+extension/node_modules/
+extension/dist/
+*.vsix

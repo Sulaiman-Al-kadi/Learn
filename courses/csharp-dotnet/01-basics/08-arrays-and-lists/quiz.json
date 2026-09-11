@@ -1,0 +1,57 @@
+{
+  "title": "Quiz — Arrays & Lists",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "What prints?",
+      "code": "int[] a = { 10, 20, 30 };\nConsole.WriteLine(a[a.Length - 1]);",
+      "options": ["30", "20", "10", "IndexOutOfRangeException"],
+      "answer": 0,
+      "explanation": "`a.Length` is 3. Valid indices are 0,1,2. `a.Length - 1` = 2, which is the last element, `30`. This is the standard idiom for 'the last element'."
+    },
+    {
+      "type": "mcq",
+      "question": "What happens?",
+      "code": "int[] a = new int[3];\na[3] = 5;",
+      "options": ["a becomes [0,0,0,5]", "The array grows to size 4", "IndexOutOfRangeException at runtime", "It does not compile"],
+      "answer": 2,
+      "explanation": "Arrays have a FIXED size chosen at creation. Valid indices for a size-3 array are 0,1,2. Index 3 doesn't exist — it throws at runtime, and the compiler cannot catch this (the index could be a variable)."
+    },
+    {
+      "type": "mcq",
+      "question": "What prints?",
+      "code": "List<int> nums = [1, 2, 3];\nnums.Add(4);\nnums.RemoveAt(0);\nConsole.WriteLine(string.Join(\",\", nums));",
+      "options": ["1,2,3,4", "2,3,4", "1,2,3", "2,3,4,1"],
+      "answer": 1,
+      "explanation": "Start [1,2,3]. Add(4) → [1,2,3,4]. RemoveAt(0) removes the element AT INDEX 0 (the value 1) → [2,3,4]."
+    },
+    {
+      "type": "mcq",
+      "question": "What prints?",
+      "code": "int[] a = [1, 2, 3];\nint[] b = a;\nb[0] = 99;\nConsole.WriteLine(a[0]);",
+      "options": ["1", "99", "0", "It does not compile"],
+      "answer": 1,
+      "explanation": "Arrays are reference types. `int[] b = a;` copies the REFERENCE, not the data — a and b point to the same array in memory. Changing through b changes what a sees too."
+    },
+    {
+      "type": "mcq",
+      "question": "You need a collection of unknown, changing size. Which should you use?",
+      "options": ["`int[]`", "`List<int>`", "Either works equally well", "`new int[100]` to be safe"],
+      "answer": 1,
+      "explanation": "`List<T>` grows and shrinks. An array's size is fixed at creation — 'just make it big' wastes memory and still has a hard limit."
+    },
+    {
+      "type": "mcq",
+      "question": "What's the property/method to get the count of elements?",
+      "options": ["Array uses `.Count()`, List uses `.Length`", "Array uses `.Length`, List uses `.Count`", "Both use `.Length`", "Both use `.Count`"],
+      "answer": 1,
+      "explanation": "This is a real gotcha in C#: arrays have a `.Length` property, `List<T>` has a `.Count` property. Mixing them up is a compile error, which at least catches it early."
+    },
+    {
+      "type": "tf",
+      "question": "`foreach` lets you modify the value of the current element in the underlying collection.",
+      "answer": false,
+      "explanation": "The `foreach` variable is a copy of each value for reading; you cannot assign to it to change the collection. To modify elements by position, use a `for` loop with the indexer: `list[i] = newValue;`."
+    }
+  ]
+}

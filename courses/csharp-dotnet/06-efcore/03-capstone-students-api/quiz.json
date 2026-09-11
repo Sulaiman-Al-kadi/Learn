@@ -1,0 +1,59 @@
+{
+  "title": "Quiz — StudentsApi v2 (EF Core + SQLite)",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "Why doesn't `StudentsController` need to change when swapping `InMemoryStudentRepository` for `EfStudentRepository`?",
+      "options": [
+        "It does need to change, significantly",
+        "The controller only depends on the IStudentRepository interface — the concrete implementation is swappable without touching code that depends on the abstraction",
+        "Both classes happen to have identical code",
+        "Controllers can't use EF Core at all"
+      ],
+      "answer": 1,
+      "explanation": "This is Dependency Inversion in action (Module 2/5): code depending on an interface is insulated from changes to whichever concrete implementation is behind it."
+    },
+    {
+      "type": "mcq",
+      "question": "Why is `AppDbContext` registered as `AddScoped` rather than `AddSingleton`?",
+      "options": [
+        "Scoped is just a style preference",
+        "A DbContext isn't safe to share across concurrent requests — Scoped gives each HTTP request its own instance",
+        "Singleton doesn't work with EF Core at all",
+        "Scoped services are faster to create"
+      ],
+      "answer": 1,
+      "explanation": "DbContext holds per-operation state (change tracking, an open connection) that isn't safe to use concurrently across multiple requests — Scoped (one instance per request) is the correct lifetime, per Module 5's lifetime table."
+    },
+    {
+      "type": "mcq",
+      "question": "Why do integration tests swap in an in-memory SQLite connection instead of using the real `students.db` file?",
+      "options": [
+        "In-memory is required by EF Core",
+        "To avoid corrupting real data and to keep tests isolated from each other — each test gets a clean, independent database",
+        "The real file doesn't support async operations",
+        "There's no actual reason, it's arbitrary"
+      ],
+      "answer": 1,
+      "explanation": "Hitting a real persistent database file from automated tests risks leftover data from previous runs interfering with each other, and could corrupt real application data. Substituting a fresh in-memory database keeps every test run clean and isolated."
+    },
+    {
+      "type": "mcq",
+      "question": "What does `services.RemoveAll<DbContextOptions<AppDbContext>>()` followed by a new `AddDbContext` call accomplish in a test factory?",
+      "options": [
+        "Deletes the AppDbContext class entirely",
+        "Removes the production database configuration and replaces it with a test-friendly one — the same 'swap the real dependency for a fake' idea as Module 4's fake HttpMessageHandler",
+        "Has no effect",
+        "Deletes all data from the real database"
+      ],
+      "answer": 1,
+      "explanation": "This is how WebApplicationFactory-based tests substitute infrastructure: remove the app's normal DI registration, add a test-specific one in its place, so the SAME application code runs against different underlying infrastructure during tests."
+    },
+    {
+      "type": "tf",
+      "question": "context.Database.EnsureCreated() at startup is functionally similar in outcome to running migrations, but without a tracked history of schema changes.",
+      "answer": true,
+      "explanation": "EnsureCreated() creates the schema directly from the current entity model in one shot — convenient for learning/tests, but real projects use migrations (lesson 01) to track and repeat schema changes across environments over time."
+    }
+  ]
+}

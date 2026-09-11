@@ -1,0 +1,61 @@
+{
+  "title": "Quiz — Relationships",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "In the Classroom/Student example, what is `ClassroomId` on `Student`?",
+      "options": [
+        "A navigation property",
+        "The foreign key — the actual column linking a student row to its classroom row",
+        "An unused property",
+        "The same thing as the navigation property Classroom"
+      ],
+      "answer": 1,
+      "explanation": "ClassroomId is the real foreign key column stored in the database. `Classroom` (the navigation property) is a C#-only convenience for accessing the related object without a manual lookup."
+    },
+    {
+      "type": "mcq",
+      "question": "What prints, given a classroom that genuinely has 2 students already saved in the database?",
+      "code": "var classroom = await context.Classrooms.FirstAsync(c => c.Name == \"Grade 10A\");\nConsole.WriteLine(classroom.Students.Count);",
+      "options": ["2", "0 — related data isn't loaded automatically without Include", "It throws an exception", "null"],
+      "answer": 1,
+      "explanation": "EF Core does NOT automatically load navigation properties (no automatic lazy loading by default). Without `.Include(c => c.Students)`, the Students collection is simply empty, even though matching rows exist in the database."
+    },
+    {
+      "type": "mcq",
+      "question": "What does `.Include(c => c.Students)` do?",
+      "options": [
+        "Filters classrooms to only ones with students",
+        "Tells EF Core to also load the Students navigation property in the same query",
+        "Adds a new student to the classroom",
+        "Deletes students not matching a condition"
+      ],
+      "answer": 1,
+      "explanation": "Include is how you explicitly ask EF Core to eager-load a related navigation property — without it, that property stays empty even when related rows exist."
+    },
+    {
+      "type": "mcq",
+      "question": "You need every Student in a specific classroom, without loading the whole Classroom object. What's a reasonable approach?",
+      "options": [
+        "You must always use Include on Classrooms",
+        "Query the Students DbSet directly: `context.Students.Where(s => s.ClassroomId == classroomId).ToListAsync()`",
+        "This is impossible in EF Core",
+        "Load every student in the database, then filter in C#"
+      ],
+      "answer": 1,
+      "explanation": "You can query from either side of a relationship — going directly to the 'many' side's DbSet and filtering by the foreign key is often simpler than loading the 'one' side with Include."
+    },
+    {
+      "type": "tf",
+      "question": "Adding students to `classroom.Students` and saving the whole graph together means you don't need to manually set each student's ClassroomId.",
+      "answer": true,
+      "explanation": "EF Core works out the foreign key values automatically when you save a connected object graph through its navigation properties — you don't need to wire up the ClassroomId by hand."
+    },
+    {
+      "type": "tf",
+      "question": "Deleting a Classroom that students depend on (a required relationship) has no effect on the related Student rows by default.",
+      "answer": false,
+      "explanation": "By default, EF Core cascades the delete — removing a Classroom also removes its dependent Student rows, since a Student can't exist without a Classroom when the foreign key is required (non-nullable)."
+    }
+  ]
+}

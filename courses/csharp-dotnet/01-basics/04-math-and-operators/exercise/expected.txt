@@ -1,0 +1,8 @@
+Score 1: Score 2: Score 3: 
+Sum: 256
+Average: 85.33
+Highest: 95
+Lowest: 73
+Range: 22
+Sum is even: True
+Last digit of sum: 6

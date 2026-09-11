@@ -1,0 +1,59 @@
+{
+  "title": "Quiz — Docker",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "What problem does containerizing an app solve?",
+      "options": [
+        "It makes code run faster",
+        "\"Works on my machine\" — a container packages the app with everything it needs, running identically across different machines/environments",
+        "It replaces the need for testing",
+        "It automatically fixes bugs in the code"
+      ],
+      "answer": 1,
+      "explanation": "Containers eliminate environment inconsistency — the same image runs the same way on your machine, a teammate's, or a production server, since the runtime and dependencies travel with the app."
+    },
+    {
+      "type": "mcq",
+      "question": "Why does the Dockerfile use TWO `FROM` stages (a multi-stage build)?",
+      "options": [
+        "It's required syntax, always exactly two stages",
+        "The full SDK is needed to COMPILE the app, but only the smaller runtime is needed to RUN it — the final image only ships the runtime + compiled output, not the full SDK",
+        "To run the app twice",
+        "To create a backup of the source code"
+      ],
+      "answer": 1,
+      "explanation": "Multi-stage builds keep the final production image small: the build stage (with the heavyweight SDK) compiles the app, then only the resulting compiled output is copied into a lean runtime-only final image."
+    },
+    {
+      "type": "mcq",
+      "question": "What's the difference between `docker build` and `docker run`?",
+      "options": [
+        "They do the same thing",
+        "`docker build` creates an image from a Dockerfile; `docker run` starts a container (a running instance) from that image",
+        "`docker run` creates the image, `docker build` starts it",
+        "Both only work with docker-compose"
+      ],
+      "answer": 1,
+      "explanation": "Building produces a reusable image (a blueprint); running actually starts a container (a live, isolated process) based on that image. You build once, and can run many containers from the same image."
+    },
+    {
+      "type": "mcq",
+      "question": "What does `docker-compose.yml` let you do that a single Dockerfile doesn't?",
+      "options": [
+        "Nothing different",
+        "Declare and start MULTIPLE related containers together (e.g. an API and its database) with one command",
+        "It replaces Dockerfiles entirely",
+        "It only works for databases, not APIs"
+      ],
+      "answer": 1,
+      "explanation": "A Dockerfile describes ONE image. docker-compose.yml describes a whole multi-container setup (which can each build from their own Dockerfile, or use a pre-built image) and starts/stops them together."
+    },
+    {
+      "type": "tf",
+      "question": "Environment variables passed into a container (via docker-compose's `environment:` section) are the same underlying configuration mechanism as Module 8's appsettings.json / Options pattern — just a different source.",
+      "answer": true,
+      "explanation": "ASP.NET Core's configuration system reads from multiple sources (appsettings.json, environment variables, command-line args, ...) and merges them. Environment variables in a container are simply another source feeding the same IConfiguration/Options pipeline from Module 8."
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "title": "Quiz — Printing",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "What does this print?",
+      "code": "Console.Write(\"Hello\");\nConsole.Write(\" \");\nConsole.WriteLine(\"World\");\nConsole.WriteLine(\"!\");",
+      "options": [
+        "`Hello World!` on one line",
+        "`Hello World` on the first line, `!` on the second",
+        "`Hello`, ` `, `World`, `!` each on its own line",
+        "It does not compile"
+      ],
+      "answer": 1,
+      "explanation": "`Write` stays on the same line, so `Hello`, a space, and `World` join up. The first `WriteLine` then ends that line, so `!` starts a new one."
+    },
+    {
+      "type": "mcq",
+      "question": "Which line prints the number **15**?",
+      "options": [
+        "`Console.WriteLine(\"10 + 5\");`",
+        "`Console.WriteLine(10 + 5);`",
+        "`Console.WriteLine(\"15\" + \"0\");`",
+        "`Console.WriteLine('15');`"
+      ],
+      "answer": 1,
+      "explanation": "Without quotes, `10 + 5` is math and evaluates to `15`. With quotes it's just the text `10 + 5`. Option 3 joins two strings into `150`. Single quotes are for one character only, so `'15'` is an error."
+    },
+    {
+      "type": "mcq",
+      "question": "What is wrong with this line?",
+      "code": "Console.WriteLine(\"Path: C:\\Learn\")",
+      "options": [
+        "Nothing, it works",
+        "Missing semicolon only",
+        "`\\L` is not a valid escape sequence only",
+        "Both: missing semicolon AND `\\L` is an invalid escape"
+      ],
+      "answer": 3,
+      "explanation": "Two errors. Every statement needs `;`, and inside a normal string `\\` starts an escape sequence — `\\L` doesn't exist. Fix: `Console.WriteLine(\"Path: C:\\\\Learn\");` or use `@\"Path: C:\\Learn\"`."
+    },
+    {
+      "type": "mcq",
+      "question": "How many lines does this print?",
+      "code": "Console.WriteLine(\"a\\nb\\nc\");",
+      "options": ["1", "2", "3", "It does not compile"],
+      "answer": 2,
+      "explanation": "Each `\\n` inside the string is a newline, so `a`, `b`, `c` end up on three separate lines — even though it's a single `WriteLine` call."
+    },
+    {
+      "type": "tf",
+      "question": "`Console.WriteLine();` with nothing inside the parentheses is an error.",
+      "answer": false,
+      "explanation": "It's valid — it prints an empty line. Handy for spacing your output."
+    },
+    {
+      "type": "mcq",
+      "question": "Which is a correct comment in C#?",
+      "options": [
+        "`# this is a comment`",
+        "`// this is a comment`",
+        "`-- this is a comment`",
+        "`** this is a comment **`"
+      ],
+      "answer": 1,
+      "explanation": "C# uses `//` for single-line comments (and `/* ... */` for multi-line ones). `#` is Python, `--` is SQL."
+    }
+  ]
+}

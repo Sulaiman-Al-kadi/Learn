@@ -1,0 +1,63 @@
+{
+  "title": "Quiz — Classes & Objects",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "What prints?",
+      "code": "public class Counter\n{\n    public int Value;\n}\n\nCounter a = new Counter();\nCounter b = new Counter();\na.Value = 5;\nConsole.WriteLine(b.Value);",
+      "options": ["5", "0", "null", "It does not compile"],
+      "answer": 1,
+      "explanation": "`a` and `b` are two separate objects, each with its own `Value` field. Changing `a.Value` has no effect on `b`. An `int` field defaults to `0` if never set."
+    },
+    {
+      "type": "mcq",
+      "question": "Given `public class Dog { public string Name; public Dog(string name) { Name = name; } }`, which line is valid?",
+      "options": [
+        "`Dog d = new Dog();`",
+        "`Dog d = new Dog(\"Rex\");`",
+        "`Dog d = new Dog; d.Name = \"Rex\";`",
+        "`Dog d; d.Name = \"Rex\";`"
+      ],
+      "answer": 1,
+      "explanation": "Once you write any constructor, the free parameterless one disappears — `new Dog()` no longer works. You must supply the required argument: `new Dog(\"Rex\")`."
+    },
+    {
+      "type": "mcq",
+      "question": "What does `this` refer to inside an instance method?",
+      "options": [
+        "The class itself, not any particular object",
+        "The object the method was called on",
+        "The method's first parameter",
+        "The previous object created"
+      ],
+      "answer": 1,
+      "explanation": "`this` is a reference to the specific object the method is currently running on — e.g. inside `rex.Bark()`, `this` is `rex`."
+    },
+    {
+      "type": "mcq",
+      "question": "What prints?",
+      "code": "BankAccount acc = new BankAccount(100);\nbool result = acc.Withdraw(150);\nConsole.WriteLine(result);\nConsole.WriteLine(acc.Balance);",
+      "options": ["True / -50", "False / 100", "True / 100", "False / -50"],
+      "answer": 1,
+      "explanation": "Withdraw checks `amount > Balance` (150 > 100) and refuses, returning `false` without changing Balance. The account correctly stays at 100."
+    },
+    {
+      "type": "tf",
+      "question": "Two `BankAccount` objects created with the same starting balance are `==` to each other.",
+      "answer": false,
+      "explanation": "Classes use reference equality by default (Module 1's memory lesson). Two separate objects are never `==`, even with identical field values, unless the class explicitly overrides equality (records do this automatically — plain classes don't)."
+    },
+    {
+      "type": "mcq",
+      "question": "In `public Dog(string name) { this.Name = name; }`, what would happen if you wrote `Name = Name;` instead of `this.Name = name;`?",
+      "options": [
+        "Same result — this.Name and Name are always interchangeable",
+        "The field Name would be set to itself (unchanged/default) — the parameter `name` would never be used",
+        "It would not compile",
+        "It would throw a runtime exception"
+      ],
+      "answer": 1,
+      "explanation": "`Name` alone refers to the field (assuming no local shadowing), so `Name = Name;` just assigns the field to itself — the parameter `name` is silently ignored. This exact mistake is why `this.Name = name;` matters when field and parameter share a name (case-insensitively similar)."
+    }
+  ]
+}

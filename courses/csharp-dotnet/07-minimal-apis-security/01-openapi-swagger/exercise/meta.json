@@ -1,0 +1,1 @@
+{ "title": "Exercise: OpenAPI-documented BooksApi", "check": "test", "student": ["App/Program.cs"] }

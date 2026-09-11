@@ -1,0 +1,59 @@
+{
+  "title": "Quiz — OpenAPI & Swagger",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "What does `app.MapOpenApi()` do?",
+      "options": [
+        "Renders an interactive Swagger UI page",
+        "Exposes a machine-readable JSON document describing your API's endpoints at /openapi/v1.json",
+        "Adds authentication to your API",
+        "Generates client code automatically"
+      ],
+      "answer": 1,
+      "explanation": "MapOpenApi() (paired with AddOpenApi()) generates and serves the raw OpenAPI JSON specification, built from inspecting your existing endpoint registrations. Swagger UI is a separate layer that renders this document nicely."
+    },
+    {
+      "type": "mcq",
+      "question": "What's the relationship between the OpenAPI document and Swagger UI?",
+      "options": [
+        "They're the same thing",
+        "The OpenAPI document is the raw JSON description; Swagger UI is an interactive webpage that reads and renders that document for humans to browse and try",
+        "Swagger UI generates the OpenAPI document",
+        "You need Swagger UI even if you don't want the JSON document"
+      ],
+      "answer": 1,
+      "explanation": "OpenAPI is the data format/standard. Swagger UI is one particular tool that consumes an OpenAPI document and presents it as a clickable, testable web page."
+    },
+    {
+      "type": "mcq",
+      "question": "Why is Swagger UI usually wrapped in `if (app.Environment.IsDevelopment())`?",
+      "options": [
+        "It only works during development for technical reasons",
+        "You typically don't want to expose an interactive 'try any endpoint' console on a real production server",
+        "It's required syntax",
+        "Production servers can't run Swagger UI"
+      ],
+      "answer": 1,
+      "explanation": "An interactive API console is a useful development tool but a potential security/exposure concern in production — most teams restrict it to non-production environments."
+    },
+    {
+      "type": "mcq",
+      "question": "What does adding `.WithSummary(\"...\")` and `.Produces<Student>(200)` to an endpoint registration change about how the endpoint behaves at runtime?",
+      "options": [
+        "It adds validation logic",
+        "Nothing about runtime behavior — it only enriches the generated OpenAPI documentation with human-readable text and expected response shapes",
+        "It changes the HTTP status code returned",
+        "It makes the endpoint require authentication"
+      ],
+      "answer": 1,
+      "explanation": "These are purely documentation annotations. The endpoint's actual behavior is unchanged — only what Swagger UI (and other OpenAPI-consuming tools) display about it improves."
+    },
+    {
+      "type": "tf",
+      "question": "Generating an OpenAPI document requires manually writing a separate description of every endpoint, duplicating your route definitions.",
+      "answer": false,
+      "explanation": "AddOpenApi() inspects your EXISTING endpoint registrations (routes, parameter types, etc.) automatically — you don't duplicate anything; you can optionally enrich the auto-generated result with methods like WithSummary."
+    }
+  ]
+}

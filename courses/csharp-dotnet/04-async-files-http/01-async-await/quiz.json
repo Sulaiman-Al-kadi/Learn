@@ -1,0 +1,67 @@
+{
+  "title": "Quiz — Async & Await",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "What does `await` actually do?",
+      "options": [
+        "Runs the awaited code on a new thread in parallel",
+        "Pauses the current async method until the awaited operation completes, without blocking the thread",
+        "Immediately returns a default value and skips the operation",
+        "Converts synchronous code into a Task automatically"
+      ],
+      "answer": 1,
+      "explanation": "await suspends the current method at that point until the Task completes, but frees up the thread to do other work in the meantime — that's the whole point, unlike Thread.Sleep or .Result which block."
+    },
+    {
+      "type": "mcq",
+      "question": "What should the return type of an async method that produces a `string` be?",
+      "options": ["`string`", "`Task<string>`", "`async string`", "`void`"],
+      "answer": 1,
+      "explanation": "Async methods that produce a value return `Task<T>` — the T being the eventual result type. Callers `await` it to get the actual `string` out."
+    },
+    {
+      "type": "mcq",
+      "question": "What's wrong with this?",
+      "code": "string result = DownloadReportAsync().Result;",
+      "options": [
+        "Nothing, this is a normal way to call async code",
+        "`.Result` blocks the thread synchronously waiting for the Task, defeating the purpose of async and risking deadlocks — use `await` instead",
+        "It doesn't compile",
+        "DownloadReportAsync must be called with parentheses only, never with .Result"
+      ],
+      "answer": 1,
+      "explanation": "`.Result` (and `.Wait()`) force the calling thread to block until the Task finishes — exactly the freezing behavior async/await exists to avoid. Always `await` instead."
+    },
+    {
+      "type": "mcq",
+      "question": "What's the benefit of `await Task.WhenAll(t1, t2, t3)` over `await t1; await t2; await t3;` (three separate awaits)?",
+      "options": [
+        "No benefit, they're identical",
+        "WhenAll lets all three run CONCURRENTLY and waits for all to finish together, rather than waiting for each one fully before starting the next",
+        "WhenAll is required syntax, the other form doesn't compile",
+        "WhenAll only works with two tasks, never three"
+      ],
+      "answer": 1,
+      "explanation": "Awaiting each Task individually in sequence means t2 doesn't even START until t1 fully finishes. If t1/t2/t3 are independent (e.g. three unrelated downloads), starting them all first and then WhenAll-ing is much faster."
+    },
+    {
+      "type": "mcq",
+      "question": "In async code, why avoid `Thread.Sleep` in favor of `await Task.Delay(...)`?",
+      "options": [
+        "Thread.Sleep is deprecated and won't compile",
+        "Thread.Sleep blocks the entire thread, reintroducing the exact freezing problem async/await is meant to solve; Task.Delay frees the thread while waiting",
+        "They behave identically",
+        "Task.Delay is always faster"
+      ],
+      "answer": 1,
+      "explanation": "Thread.Sleep blocks synchronously — nothing else can run on that thread while it sleeps. Task.Delay, when awaited, releases the thread to do other work until the delay elapses."
+    },
+    {
+      "type": "tf",
+      "question": "try/catch around an `await` call works exactly the same as around any normal synchronous call.",
+      "answer": true,
+      "explanation": "Exceptions thrown inside an awaited async operation surface at the await point and can be caught with an ordinary try/catch — no special async exception-handling syntax is needed."
+    }
+  ]
+}

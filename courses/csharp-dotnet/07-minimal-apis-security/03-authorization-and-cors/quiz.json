@@ -1,0 +1,60 @@
+{
+  "title": "Quiz — Authorization Policies & CORS",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "A request has a valid, unexpired JWT — but the user's role doesn't match what an endpoint requires. What status code should it get?",
+      "options": ["401 Unauthorized", "403 Forbidden", "404 Not Found", "400 Bad Request"],
+      "answer": 1,
+      "explanation": "401 means 'we don't know who you are' (missing/invalid token). 403 means 'we know who you are, and you're not allowed to do this' — the correct response when a valid but insufficiently-privileged token is presented."
+    },
+    {
+      "type": "mcq",
+      "question": "What's the benefit of a named policy (`AddPolicy(\"AdminOnly\", ...)`) over repeating `policy.RequireRole(\"Admin\")` on every endpoint?",
+      "options": [
+        "Named policies are faster at runtime",
+        "Define the rule once, reuse it by name everywhere — avoids repeating (and risking inconsistency in) the same authorization logic",
+        "There's no real difference",
+        "Named policies are required by ASP.NET Core"
+      ],
+      "answer": 1,
+      "explanation": "This is the DRY principle (Module 1) applied to authorization rules — define once, reference by name, and a future change to what 'AdminOnly' means only needs to happen in one place."
+    },
+    {
+      "type": "mcq",
+      "question": "What does CORS actually restrict?",
+      "options": [
+        "All access to your API from any client, browser or not",
+        "Which origins (websites) a BROWSER will allow to call your API via JavaScript — it doesn't restrict HttpClient, curl, Postman, or other non-browser clients",
+        "Which HTTP methods your API supports",
+        "Database access"
+      ],
+      "answer": 1,
+      "explanation": "CORS is a browser-enforced same-origin policy relaxation mechanism. It has no effect on requests made outside a browser context (HttpClient, curl, server-to-server calls) — those were never blocked by the same-origin policy to begin with."
+    },
+    {
+      "type": "mcq",
+      "question": "What does `.WithOrigins(\"https://myfrontend.com\").AllowAnyHeader().AllowAnyMethod()` configure?",
+      "options": [
+        "Which users can log in",
+        "That browser JavaScript running on https://myfrontend.com is allowed to call this API, with any headers and any HTTP method",
+        "That the API only accepts requests from a specific IP address",
+        "Server-side rate limiting"
+      ],
+      "answer": 1,
+      "explanation": "This is a CORS policy: it names an allowed origin and what that origin's browser-based requests are permitted to include."
+    },
+    {
+      "type": "tf",
+      "question": "Skipping CORS configuration entirely prevents any unauthorized access to your API.",
+      "answer": false,
+      "explanation": "CORS only affects browser-based JavaScript calls from other origins — it is NOT a general access control mechanism. An API without CORS configured is still fully reachable by HttpClient, curl, Postman, or a browser simply navigating directly to it. Authentication/authorization (this module) is what actually restricts access; CORS is about controlling cross-origin BROWSER behavior."
+    },
+    {
+      "type": "tf",
+      "question": "Middleware order matters for `app.UseCors(...)`, just as it does for authentication and authorization.",
+      "answer": true,
+      "explanation": "Like every middleware (lesson 01), UseCors must be positioned correctly in the pipeline — typically early, before the request reaches routing/authorization — for cross-origin requests (including preflight OPTIONS requests) to be handled correctly."
+    }
+  ]
+}

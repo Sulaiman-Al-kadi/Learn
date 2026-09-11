@@ -1,0 +1,7 @@
+=== Coffee Shop ===
+Item:	Latte
+Price:	15
+Qty:	2
+Total:	30
+Thanks for visiting "Bean & Co"!
+Path: C:\shop\receipts

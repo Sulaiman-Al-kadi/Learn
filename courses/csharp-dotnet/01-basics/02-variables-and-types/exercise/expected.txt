@@ -1,0 +1,7 @@
+--- Student Card ---
+Name:      Layla Hassan
+Age:       21
+GPA:       3.75
+Enrolled:  True
+Initial:   L
+In 4 years Layla Hassan will be 25.

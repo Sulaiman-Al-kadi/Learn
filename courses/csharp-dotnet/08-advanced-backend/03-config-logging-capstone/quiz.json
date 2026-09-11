@@ -1,0 +1,59 @@
+{
+  "title": "Quiz — Configuration & Structured Logging",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "What's the main advantage of the Options pattern (`IOptions<NotifierSettings>`) over raw `builder.Configuration[\"Notifier:FromAddress\"]` string access?",
+      "options": [
+        "No real advantage, they're identical",
+        "Strongly-typed access with IntelliSense — a typo'd config key silently leaves a default value rather than being caught, but at least the C# property name itself can't be mistyped without a compile error",
+        "The Options pattern is faster at runtime",
+        "Raw string access doesn't work at all in ASP.NET Core"
+      ],
+      "answer": 1,
+      "explanation": "Binding configuration to a real class lets you write `_settings.FromAddress` with compiler-checked property names and autocomplete, instead of scattering string literal keys (each a typo risk) throughout your codebase."
+    },
+    {
+      "type": "mcq",
+      "question": "What's the difference between `_logger.LogInformation(\"Sending to \" + to)` and `_logger.LogInformation(\"Sending to {To}\", to)`?",
+      "options": [
+        "No difference — both just produce text",
+        "The second keeps 'To' as a separate, named, structured field a logging provider (like Serilog) can capture and query independently — not just baked into a flat string",
+        "The first is faster",
+        "The second doesn't compile"
+      ],
+      "answer": 1,
+      "explanation": "This is structured logging's whole point: `{To}` is a named placeholder the logging framework tracks as its own field (queryable, filterable in log tools), unlike string concatenation which produces only an opaque block of text."
+    },
+    {
+      "type": "mcq",
+      "question": "Why should application code depend on `ILogger<T>` rather than directly calling Serilog's API?",
+      "options": [
+        "ILogger<T> is required syntax",
+        "It's the same Dependency Inversion idea from Module 2 — code depends on the logging ABSTRACTION, so the concrete provider (Serilog, or anything else) can be swapped or reconfigured without touching application code",
+        "Serilog doesn't have its own API",
+        "There's no real reason, it's just convention"
+      ],
+      "answer": 1,
+      "explanation": "Exactly like INotifier/IStudentRepository earlier in the course — depending on ILogger<T> means the actual logging destination(s) and format are a configuration/wiring concern, not something scattered through business logic."
+    },
+    {
+      "type": "mcq",
+      "question": "What does `builder.Services.Configure<NotifierSettings>(builder.Configuration.GetSection(\"Notifier\"))` do?",
+      "options": [
+        "Nothing without further setup",
+        "Binds the \"Notifier\" section of appsettings.json to a NotifierSettings instance, made available for injection as IOptions<NotifierSettings>",
+        "Deletes the Notifier configuration section",
+        "Directly instantiates a Notifier object"
+      ],
+      "answer": 1,
+      "explanation": "This registers the binding: whatever JSON is under the \"Notifier\" key gets mapped onto NotifierSettings' properties, and any class can then receive it via constructor-injected IOptions<NotifierSettings>."
+    },
+    {
+      "type": "tf",
+      "question": "Once Serilog is configured in Program.cs to write structured JSON logs to a file, every `_logger.LogInformation(...)` call throughout the app automatically benefits, with no changes to that calling code.",
+      "answer": true,
+      "explanation": "This is the payoff of coding against ILogger<T>: the logging destination/format is entirely a Program.cs configuration concern. Code that just calls _logger.LogInformation(...) never needs to know or care that Serilog is writing JSON to a file underneath."
+    }
+  ]
+}

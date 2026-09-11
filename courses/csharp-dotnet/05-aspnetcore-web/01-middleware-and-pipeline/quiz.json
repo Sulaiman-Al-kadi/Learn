@@ -1,0 +1,67 @@
+{
+  "title": "Quiz — Middleware & the Request Pipeline",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "What does `await next();` do inside a middleware?",
+      "options": [
+        "Ends the request immediately with a 200 OK",
+        "Passes control to the next middleware in the pipeline (or the endpoint, if this is the last one)",
+        "Restarts the pipeline from the beginning",
+        "Logs the request automatically"
+      ],
+      "answer": 1,
+      "explanation": "next is a delegate representing 'the rest of the pipeline.' Calling it hands control onward; code written after `await next()` in your middleware runs later, on the way back out."
+    },
+    {
+      "type": "mcq",
+      "question": "What happens if a middleware never calls `next()`?",
+      "options": [
+        "Nothing different happens",
+        "The request short-circuits — nothing further down the pipeline, including the endpoint, ever runs",
+        "It causes an infinite loop",
+        "The app crashes"
+      ],
+      "answer": 1,
+      "explanation": "Skipping next() stops the request right there. This is intentional and useful — e.g., authentication middleware short-circuits with a 401 response when the user isn't logged in, never reaching the actual endpoint."
+    },
+    {
+      "type": "mcq",
+      "question": "Given two middlewares A then B (each printing before/after `next()`), what's the execution order?",
+      "code": "app.Use(async (ctx, next) => { Print(\"A start\"); await next(); Print(\"A end\"); });\napp.Use(async (ctx, next) => { Print(\"B start\"); await next(); Print(\"B end\"); });",
+      "options": [
+        "A start, B start, B end, A end",
+        "A start, A end, B start, B end",
+        "B start, A start, A end, B end",
+        "A start, B start, A end, B end"
+      ],
+      "answer": 0,
+      "explanation": "Middlewares nest like layers: A wraps B. A's 'before' code runs first, then B's 'before' code, then (after the endpoint) B's 'after' code, then finally A's 'after' code — first registered, last to finish."
+    },
+    {
+      "type": "mcq",
+      "question": "What does `app.MapGet(\"/data\", () => new { Name = \"Ali\" });` send as the response?",
+      "options": [
+        "Plain text: 'new { Name = Ali }'",
+        "A 200 OK with the object automatically serialized to JSON",
+        "An error, since objects can't be returned directly",
+        "A redirect"
+      ],
+      "answer": 1,
+      "explanation": "ASP.NET Core automatically JSON-serializes returned objects as the response body, with a 200 OK status and the appropriate content type — you don't call JsonSerializer yourself."
+    },
+    {
+      "type": "mcq",
+      "question": "What tool lets you test a web app by sending it real HTTP requests without starting a real server on a real port?",
+      "options": ["Console.ReadLine simulation", "WebApplicationFactory, which runs the app in memory", "Docker", "There's no way to do this"],
+      "answer": 1,
+      "explanation": "WebApplicationFactory<Program> hosts your entire application in memory for the duration of a test, giving you an HttpClient that talks to it directly — no real network, no real port, but genuinely exercising the whole pipeline."
+    },
+    {
+      "type": "tf",
+      "question": "app.MapPost is used for reading data; app.MapGet is used for creating data.",
+      "answer": false,
+      "explanation": "It's the reverse: MapGet is for reading/retrieving (GET), MapPost is for creating (POST) — this is standard REST/HTTP method convention, covered further in lesson 02."
+    }
+  ]
+}

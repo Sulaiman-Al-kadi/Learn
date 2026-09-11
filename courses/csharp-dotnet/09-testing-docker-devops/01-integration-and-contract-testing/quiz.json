@@ -1,0 +1,59 @@
+{
+  "title": "Quiz — Integration & Contract Testing",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "Why does the testing pyramid have MANY unit tests at the bottom and FEW end-to-end tests at the top?",
+      "options": [
+        "Unit tests are more important than E2E tests",
+        "Unit tests are fast and cheap, catching most bugs efficiently; E2E tests are slow and expensive, reserved for what only shows up in the full real system",
+        "E2E tests don't actually test anything useful",
+        "It's an arbitrary convention with no real reasoning"
+      ],
+      "answer": 1,
+      "explanation": "The shape reflects a cost/speed tradeoff: fast, cheap unit tests should catch the bulk of bugs; fewer, slower integration and E2E tests fill in what unit tests structurally can't catch (wiring, routing, real system interaction)."
+    },
+    {
+      "type": "mcq",
+      "question": "Which of these is an INTEGRATION test, not a unit test?",
+      "options": [
+        "Testing a Library class with a fake ILateFeePolicy injected",
+        "Using WebApplicationFactory to send a real HTTP request through your app's actual routing, model binding, and database",
+        "Testing a single method's return value with no dependencies at all",
+        "Testing that a record's Equals works correctly"
+      ],
+      "answer": 1,
+      "explanation": "WebApplicationFactory tests exercise multiple REAL pieces together (routing, DI, database) rather than one class in isolation with fakes — that's the defining trait of an integration test."
+    },
+    {
+      "type": "mcq",
+      "question": "What does a contract test verify that a normal integration test testing `student.Name == \"Ali\"` does NOT?",
+      "options": [
+        "Nothing different",
+        "That the response's SHAPE (required fields, JSON types) is correct — independent of which specific student or data values come back",
+        "That the database connection works",
+        "That the server is running on the correct port"
+      ],
+      "answer": 1,
+      "explanation": "A contract test focuses on structure — field presence and types — rather than specific values. It catches breaking API shape changes (a renamed or retyped field) that a value-specific assertion wouldn't necessarily be designed to catch."
+    },
+    {
+      "type": "mcq",
+      "question": "Why use `JsonDocument.Parse(...)` instead of `JsonSerializer.Deserialize<T>(...)` for a contract test?",
+      "options": [
+        "JsonDocument is faster",
+        "Contract tests check STRUCTURE without assuming a specific target type already matches — JsonDocument gives a low-level, navigable view of any JSON, which is exactly what's needed to verify shape rather than deserialize into an assumed-correct type",
+        "Deserialize<T> doesn't work with JSON",
+        "There's no real difference"
+      ],
+      "answer": 1,
+      "explanation": "Deserialize<T> presupposes T already correctly describes the shape — if the actual response doesn't match T, you might get silent default values rather than a clear failure. JsonDocument lets you explicitly check field-by-field what's actually present."
+    },
+    {
+      "type": "tf",
+      "question": "A breaking change to an API's response shape (e.g., renaming a field) can pass all of an app's internal logic-focused tests while still breaking every external consumer of that API.",
+      "answer": true,
+      "explanation": "Internal logic tests check behavior/values, not necessarily the exact response shape. This is exactly the gap contract tests are designed to close — verifying the shape consumers depend on hasn't silently changed."
+    }
+  ]
+}

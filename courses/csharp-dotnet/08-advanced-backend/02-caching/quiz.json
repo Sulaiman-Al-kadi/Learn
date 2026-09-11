@@ -1,0 +1,71 @@
+{
+  "title": "Quiz — Caching",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "What is the 'cache-aside' pattern?",
+      "options": [
+        "Always read from the database, never the cache",
+        "Check the cache first; on a miss, do the expensive work, store the result in the cache, then return it",
+        "Cache everything permanently, forever",
+        "A pattern only usable with databases, never with computed values"
+      ],
+      "answer": 1,
+      "explanation": "Cache-aside is exactly this check-then-populate flow: TryGetValue (or GetOrCreateAsync) checks the cache; only on a miss does the real (expensive) work happen, with the result cached for next time."
+    },
+    {
+      "type": "mcq",
+      "question": "What does `_cache.Set(\"all_products\", products, TimeSpan.FromMinutes(10))` mean?",
+      "options": [
+        "The products are permanently cached",
+        "The cached value is automatically evicted after 10 minutes, after which the next request becomes a cache miss again",
+        "The database is queried every 10 minutes automatically",
+        "It caches for exactly 10 requests, not a time duration"
+      ],
+      "answer": 1,
+      "explanation": "The TimeSpan argument is an expiration — after that duration elapses, the cached entry is removed, and the next lookup will be a miss requiring fresh work."
+    },
+    {
+      "type": "mcq",
+      "question": "A CreateProduct method adds a new product to the database but doesn't touch the cache. What's the bug?",
+      "options": [
+        "There is no bug",
+        "The cached 'all_products' list is now stale — it won't include the new product until its expiration naturally passes",
+        "The new product won't actually save to the database",
+        "This causes a runtime exception"
+      ],
+      "answer": 1,
+      "explanation": "The cache has no way to know the underlying data changed. Without explicitly calling _cache.Remove(\"all_products\") (or otherwise updating the entry), callers will see the stale cached list until it expires on its own."
+    },
+    {
+      "type": "mcq",
+      "question": "Which scenario is a BAD candidate for caching?",
+      "options": [
+        "A rarely-changing list of countries",
+        "A user's current bank account balance, checked right before allowing a withdrawal",
+        "A product catalog that updates a few times a day",
+        "A computed report that's expensive to generate and rarely changes"
+      ],
+      "answer": 1,
+      "explanation": "A bank balance needs to be accurate at the moment of a critical decision (allowing a withdrawal) — staleness here could allow overdrawing. This is exactly the kind of data where caching's correctness risk outweighs its performance benefit."
+    },
+    {
+      "type": "mcq",
+      "question": "What does `GetOrCreateAsync` combine into one call?",
+      "options": [
+        "Nothing, it's identical to Set",
+        "The check-cache-then-populate-on-miss flow — check the cache, and only run the provided lambda (and cache its result) if there was a miss",
+        "Deleting and recreating the entire cache",
+        "It only works for database calls, not any other computation"
+      ],
+      "answer": 1,
+      "explanation": "GetOrCreateAsync is a convenience wrapper around the exact TryGetValue/Set cache-aside pattern — check first, populate only on a miss, all in one call."
+    },
+    {
+      "type": "tf",
+      "question": "Caching per-user data under one shared cache key could cause one user to see another user's data.",
+      "answer": true,
+      "explanation": "This is a real and serious class of bug — if the cache key doesn't include something that distinguishes users (like a user id), everyone sharing that key would see whichever user's data was cached first."
+    }
+  ]
+}

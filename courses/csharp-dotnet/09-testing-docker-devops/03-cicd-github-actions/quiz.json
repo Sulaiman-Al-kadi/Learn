@@ -1,0 +1,59 @@
+{
+  "title": "Quiz — CI/CD with GitHub Actions",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "What's the difference between Continuous Integration and Continuous Deployment/Delivery?",
+      "options": [
+        "They're the same thing",
+        "CI automatically builds and tests every push; CD automatically packages/ships the result if CI passes",
+        "CD runs before CI",
+        "CI only applies to Docker, CD only applies to .NET"
+      ],
+      "answer": 1,
+      "explanation": "CI catches broken code early via automated build+test on every push. CD extends that by automatically delivering the working result (e.g., a Docker image) once CI succeeds — together forming an automated pipeline."
+    },
+    {
+      "type": "mcq",
+      "question": "What does `needs: build-and-test` on the image-push job accomplish?",
+      "options": [
+        "Nothing, it's optional decoration",
+        "The push job only runs if the build-and-test job succeeded — preventing a broken build from being packaged and pushed",
+        "It makes the jobs run in parallel",
+        "It duplicates the build-and-test job"
+      ],
+      "answer": 1,
+      "explanation": "This dependency is what turns several independent jobs into a real PIPELINE — a failure upstream (failing tests) automatically blocks everything downstream (pushing an image), with no manual intervention needed."
+    },
+    {
+      "type": "mcq",
+      "question": "Where should Docker Hub credentials used by a GitHub Actions workflow be stored?",
+      "options": [
+        "Hardcoded directly in the workflow YAML file",
+        "As GitHub repository secrets, referenced via ${{ secrets.NAME }} — never committed to source",
+        "In a comment in the Dockerfile",
+        "In an environment variable set on the developer's own laptop"
+      ],
+      "answer": 1,
+      "explanation": "Same principle as Module 7's JWT signing key — real secrets belong in a secrets manager (here, GitHub's repo secrets), never committed to source control where anyone with repo access (or a public repo, anyone at all) could read them."
+    },
+    {
+      "type": "mcq",
+      "question": "What happens on GitHub when `dotnet test` fails inside a workflow run?",
+      "options": [
+        "Nothing is recorded",
+        "The job (and the overall run) is marked failed, visible on the PR — and can block merging if a branch protection rule requires the check to pass",
+        "The workflow automatically fixes the failing test",
+        "GitHub deletes the failing commit"
+      ],
+      "answer": 1,
+      "explanation": "A failed step fails the job, which fails the run — visible as a red X on the PR/commit. Combined with a branch protection rule, this can literally prevent merging code with failing tests."
+    },
+    {
+      "type": "tf",
+      "question": "Each GitHub Actions job runs on a fresh, temporary virtual machine, with nothing persisting from previous runs unless explicitly cached or saved.",
+      "answer": true,
+      "explanation": "`runs-on: ubuntu-latest` provisions a clean VM for that job. This is why workflows explicitly check out code, restore dependencies, etc. every time — nothing is assumed to already be there from a previous run."
+    }
+  ]
+}

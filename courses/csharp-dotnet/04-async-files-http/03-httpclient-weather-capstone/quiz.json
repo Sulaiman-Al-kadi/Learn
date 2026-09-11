@@ -1,0 +1,59 @@
+{
+  "title": "Quiz — HttpClient & Weather API Client",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "What does `response.IsSuccessStatusCode` check?",
+      "options": [
+        "Whether the JSON body is valid",
+        "Whether the HTTP status code is in the 2xx range (200-299)",
+        "Whether the request timed out",
+        "Whether the client has internet access"
+      ],
+      "answer": 1,
+      "explanation": "IsSuccessStatusCode is true for 2xx status codes (200 OK, 201 Created, etc.) and false for 4xx (client errors, e.g. 404 Not Found) and 5xx (server errors)."
+    },
+    {
+      "type": "mcq",
+      "question": "What does `ReadFromJsonAsync<WeatherResult>()` do that `ReadAsStringAsync()` + `JsonSerializer.Deserialize<WeatherResult>()` also accomplishes, just combined?",
+      "options": [
+        "Nothing, they do completely different things",
+        "Reads the HTTP response body AND deserializes it into a WeatherResult, in one awaited call",
+        "Only reads the body as text, never deserializes",
+        "Only works with XML, not JSON"
+      ],
+      "answer": 1,
+      "explanation": "ReadFromJsonAsync<T> is a convenience method that combines reading the response content and JSON-deserializing it into one step, instead of two separate calls."
+    },
+    {
+      "type": "mcq",
+      "question": "Why does `WeatherClient` take an `HttpClient` through its constructor instead of creating `new HttpClient()` inside itself?",
+      "options": [
+        "It's required syntax",
+        "Dependency Inversion (Module 2) — this lets tests substitute a fake HttpMessageHandler and verify behavior without making real network calls",
+        "HttpClient can only be created once per program",
+        "It makes the code run faster"
+      ],
+      "answer": 1,
+      "explanation": "Constructor injection means WeatherClient depends on whatever HttpClient it's given — including one wired to a fake handler in tests — rather than being permanently welded to real network access."
+    },
+    {
+      "type": "mcq",
+      "question": "In the exercise's design, what should `GetWeatherAsync` do if the response is NOT successful (e.g. 404)?",
+      "options": [
+        "Throw an exception",
+        "Return null",
+        "Return a WeatherResult with default values",
+        "Retry the request automatically"
+      ],
+      "answer": 1,
+      "explanation": "A 'not found' or failed response is modeled as a null return, not an exception — it's a normal, expected outcome the caller should check for, following the FirstOrDefault/TryParse philosophy from earlier lessons."
+    },
+    {
+      "type": "tf",
+      "question": "Testing HTTP client code with a fake HttpMessageHandler makes the test faster and more reliable than hitting a real API, because it removes network dependency entirely.",
+      "answer": true,
+      "explanation": "A fake handler returns a canned, deterministic response instantly, with no dependency on network availability, API uptime, or rate limits — exactly what a good unit test needs."
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+{ "title": "Exercise: JSON file store", "check": "test", "student": ["JsonFileStore.cs"] }

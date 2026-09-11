@@ -1,0 +1,56 @@
+{
+  "title": "Quiz — MVC Controllers & Dependency Injection",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "In `[Route(\"api/[controller]\")] public class StudentsController : ControllerBase`, what route does this serve?",
+      "options": ["api/StudentsController", "api/students", "controller/students", "It needs an explicit route, this won't compile"],
+      "answer": 1,
+      "explanation": "[controller] is replaced with the class name minus the 'Controller' suffix, lowercased by convention in the resulting route — StudentsController serves api/students."
+    },
+    {
+      "type": "mcq",
+      "question": "What's the equivalent of Minimal API's `Results.Ok(value)` inside an MVC controller action?",
+      "options": ["`return value;`", "`return Ok(value);` — inherited from ControllerBase", "`Results.Ok(value)` — same syntax, no change", "`return Results.Value(value);`"],
+      "answer": 1,
+      "explanation": "ControllerBase provides Ok(), NotFound(), Created(), etc. as inherited instance methods (Module 2's inheritance) — same concept as Results.*, different calling style."
+    },
+    {
+      "type": "mcq",
+      "question": "What does `builder.Services.AddSingleton<IStudentRepository, InMemoryStudentRepository>();` do?",
+      "options": [
+        "Creates an instance immediately and prints it",
+        "Registers IStudentRepository with the DI container — one shared instance of InMemoryStudentRepository will be handed out for the app's entire lifetime whenever IStudentRepository is requested",
+        "Makes InMemoryStudentRepository the only class allowed in the project",
+        "Nothing — this line has no effect without further configuration"
+      ],
+      "answer": 1,
+      "explanation": "This registers the mapping in the DI container: 'when something needs an IStudentRepository, give it this SHARED InMemoryStudentRepository instance.' Singleton means one instance for the whole app's lifetime."
+    },
+    {
+      "type": "mcq",
+      "question": "Why does `StudentsController` take `IStudentRepository` (not `InMemoryStudentRepository`) in its constructor?",
+      "options": [
+        "No real reason, either would work identically",
+        "Dependency Inversion (Module 2) — the controller depends on the abstraction, so the concrete implementation can be swapped (e.g., for a database-backed one in Module 6) without changing the controller",
+        "Interfaces are required syntax for all constructor parameters",
+        "InMemoryStudentRepository doesn't have a public constructor"
+      ],
+      "answer": 1,
+      "explanation": "This is DIP applied directly: the controller only knows about the CAPABILITY (IStudentRepository), not the specific implementation — exactly the OrderProcessor/INotifier pattern from Module 2, lesson 08."
+    },
+    {
+      "type": "mcq",
+      "question": "Which lifetime is appropriate for a service that must hold ONE consistent piece of state shared across the entire running application (like an in-memory list acting as a fake database)?",
+      "options": ["Transient", "Scoped", "Singleton", "None of these support shared state"],
+      "answer": 2,
+      "explanation": "Singleton creates exactly one instance for the whole app's lifetime — perfect for a shared in-memory store where every request should see the same underlying data."
+    },
+    {
+      "type": "tf",
+      "question": "Minimal API handlers can also receive DI-registered services, as extra parameters, the same way controllers receive them via their constructor.",
+      "answer": true,
+      "explanation": "`app.MapGet(\"/students\", (IStudentRepository repository) => repository.GetAll());` — the DI container resolves `repository` automatically, just like it resolves controller constructor parameters."
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+{ "title": "Capstone: StudentsApi v2 (EF Core + SQLite)", "check": "test", "student": ["App/EfStudentRepository.cs"] }

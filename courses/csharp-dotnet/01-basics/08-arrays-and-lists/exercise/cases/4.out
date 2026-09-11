@@ -1,0 +1,5 @@
+Original: 10, 10, 9, 9, 8
+Sorted: 8, 9, 9, 10, 10
+Reversed: 8, 9, 9, 10, 10
+Unique: 10, 9, 8
+Second largest: 9

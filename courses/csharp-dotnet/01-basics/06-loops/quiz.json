@@ -1,0 +1,58 @@
+{
+  "title": "Quiz — Loops",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "What prints?",
+      "code": "for (int i = 0; i < 4; i++)\n{\n    Console.Write(i);\n}",
+      "options": ["0123", "01234", "1234", "0 1 2 3 4"],
+      "answer": 0,
+      "explanation": "Starts at 0, runs while `i < 4`: 0, 1, 2, 3 — stops before 4 is printed. `Console.Write` has no space between them, so `0123`."
+    },
+    {
+      "type": "mcq",
+      "question": "How many times does the block run?",
+      "code": "int i = 0;\nwhile (i < 5)\n{\n    Console.WriteLine(i);\n}",
+      "options": ["5 times", "0 times", "Infinite — this never stops", "It does not compile"],
+      "answer": 2,
+      "explanation": "`i` is never changed inside the loop, so `i < 5` is always true. This is the classic infinite loop bug — forgetting to update the condition variable."
+    },
+    {
+      "type": "mcq",
+      "question": "What prints?",
+      "code": "for (int i = 1; i <= 5; i++)\n{\n    if (i == 3) continue;\n    if (i == 5) break;\n    Console.Write(i);\n}",
+      "options": ["1245", "124", "12345", "1234"],
+      "answer": 1,
+      "explanation": "i=1 prints, i=2 prints, i=3 hits `continue` (skipped, loop goes on), i=4 prints, i=5 hits `break` (loop stops before printing). Result: `124`."
+    },
+    {
+      "type": "mcq",
+      "question": "What is `sum` after this runs?",
+      "code": "int sum = 0;\nfor (int i = 1; i <= 4; i++)\n{\n    sum += i;\n}",
+      "options": ["10", "4", "6", "It does not compile"],
+      "answer": 0,
+      "explanation": "sum accumulates 1+2+3+4 = 10. This is the accumulator pattern: declare before the loop, update inside."
+    },
+    {
+      "type": "mcq",
+      "question": "Which loop guarantees the block runs at least once, even if the condition starts false?",
+      "options": ["`for`", "`while`", "`do...while`", "`foreach`"],
+      "answer": 2,
+      "explanation": "`do...while` checks the condition AFTER running the block, so the first run always happens regardless of the condition."
+    },
+    {
+      "type": "mcq",
+      "question": "How many total lines does this print?",
+      "code": "for (int r = 0; r < 2; r++)\n{\n    for (int c = 0; c < 3; c++)\n    {\n        Console.WriteLine($\"{r},{c}\");\n    }\n}",
+      "options": ["2", "3", "5", "6"],
+      "answer": 3,
+      "explanation": "Outer loop runs 2 times; for EACH of those, the inner loop runs 3 times → 2 × 3 = 6 total WriteLine calls."
+    },
+    {
+      "type": "tf",
+      "question": "`break` inside the inner loop of a nested loop also stops the outer loop.",
+      "answer": false,
+      "explanation": "`break` only exits the innermost loop it's written in. The outer loop continues to its next iteration."
+    }
+  ]
+}

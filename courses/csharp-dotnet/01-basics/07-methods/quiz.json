@@ -1,0 +1,74 @@
+{
+  "title": "Quiz — Methods",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "What prints?",
+      "code": "static int Double(int n)\n{\n    return n * 2;\n}\n\nConsole.WriteLine(Double(5) + 1);",
+      "options": ["10", "11", "6", "It does not compile"],
+      "answer": 1,
+      "explanation": "`Double(5)` returns 10, then `+ 1` makes 11. The method call is evaluated first, then used like any value."
+    },
+    {
+      "type": "mcq",
+      "question": "What is wrong with this method?",
+      "code": "static int Square(int n)\n{\n    int result = n * n;\n}",
+      "options": [
+        "Nothing, it's fine",
+        "It declares `int result` but never returns it — this won't compile",
+        "`n * n` should be `n + n`",
+        "It's missing `static`"
+      ],
+      "answer": 1,
+      "explanation": "The method promises to return an `int` but its body never executes a `return` with a value. The compiler requires every code path in a non-void method to return a value."
+    },
+    {
+      "type": "mcq",
+      "question": "What prints?",
+      "code": "static void Warn(int n)\n{\n    if (n < 0) return;\n    Console.WriteLine(\"positive: \" + n);\n}\n\nWarn(-5);\nWarn(5);",
+      "options": ["positive: -5\\npositive: 5", "positive: 5", "Nothing prints", "It does not compile"],
+      "answer": 1,
+      "explanation": "`Warn(-5)` hits `return;` immediately (n < 0) and prints nothing. `Warn(5)` skips the return and prints the line."
+    },
+    {
+      "type": "mcq",
+      "question": "Given `static string Greet(string name, string greeting = \"Hi\")`, which call is INVALID?",
+      "options": [
+        "`Greet(\"Ali\")`",
+        "`Greet(\"Ali\", \"Hello\")`",
+        "`Greet(greeting: \"Hello\", name: \"Ali\")`",
+        "`Greet(greeting: \"Hello\")`"
+      ],
+      "answer": 3,
+      "explanation": "`name` has no default value, so it's required. You must supply it, whether positionally or by name — `Greet(greeting: \"Hello\")` never provides a name."
+    },
+    {
+      "type": "mcq",
+      "question": "What does `Sum()` return, given `static int Sum(params int[] nums) { int t = 0; foreach (var n in nums) t += n; return t; }`?",
+      "code": "Console.WriteLine(Sum());",
+      "options": ["0", "It crashes — no arguments given", "It does not compile", "null"],
+      "answer": 0,
+      "explanation": "`params` accepts zero or more arguments. With none, `nums` is an empty array, the loop never runs, and `t` stays 0."
+    },
+    {
+      "type": "mcq",
+      "question": "What prints?",
+      "code": "static void A()\n{\n    int x = 10;\n    B();\n}\nstatic void B()\n{\n    Console.WriteLine(x);\n}",
+      "options": ["10", "0", "It does not compile — x is out of scope in B", "null"],
+      "answer": 2,
+      "explanation": "`x` is a local variable of `A`. It doesn't exist inside `B`, even though `B` was called from `A`. Each method has its own scope."
+    },
+    {
+      "type": "mcq",
+      "question": "Which pair of methods is a valid overload (both can coexist)?",
+      "options": [
+        "`int F(int x)` and `int F(int y)`",
+        "`int F(int x)` and `double F(int x)`",
+        "`int F(int x)` and `int F(int x, int y)`",
+        "`int F(int x)` and `int F(int z)` with a different body"
+      ],
+      "answer": 2,
+      "explanation": "Overloads must differ in their parameter list (count or types), not just the return type or the parameter's name. `F(int x)` and `F(int x, int y)` differ in parameter count — valid. `F(int x)` and `F(int y)` are actually the SAME signature (parameter names don't count) — a duplicate, not an overload."
+    }
+  ]
+}

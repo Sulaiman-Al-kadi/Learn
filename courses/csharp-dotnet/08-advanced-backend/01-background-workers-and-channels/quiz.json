@@ -1,0 +1,71 @@
+{
+  "title": "Quiz — Background Workers & Channels",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "What does overriding `ExecuteAsync(CancellationToken stoppingToken)` in a `BackgroundService` give you?",
+      "options": [
+        "A method that runs once per HTTP request",
+        "A place for work that runs for the entire lifetime of the app, independent of any individual request",
+        "A way to handle exceptions globally",
+        "A method that only runs in development"
+      ],
+      "answer": 1,
+      "explanation": "ExecuteAsync starts when the app starts and (typically via a loop) continues running until the app shuts down — it has nothing to do with individual HTTP requests."
+    },
+    {
+      "type": "mcq",
+      "question": "Why should a BackgroundService's loop check `stoppingToken` and pass it into `await` calls?",
+      "options": [
+        "It's optional decoration with no real effect",
+        "So the worker stops promptly when the app is shutting down, instead of blocking shutdown or continuing to run after the app should have stopped",
+        "It makes the loop run faster",
+        "It's required syntax that does nothing functionally"
+      ],
+      "answer": 1,
+      "explanation": "stoppingToken is signaled during app shutdown. Checking it (and passing it to Task.Delay/PeriodicTimer waits) lets the background work exit promptly rather than delaying shutdown or running past when it should stop."
+    },
+    {
+      "type": "mcq",
+      "question": "A BackgroundService is a singleton, but it needs to use a Scoped DbContext. What's the correct approach?",
+      "options": [
+        "Inject the DbContext directly into the BackgroundService's constructor",
+        "Inject IServiceProvider, then call CreateScope() each time you need the scoped service, disposing the scope afterward",
+        "Change the DbContext's lifetime to Singleton",
+        "It's impossible to use a DbContext inside a BackgroundService"
+      ],
+      "answer": 1,
+      "explanation": "A long-lived singleton can't safely hold a long-lived reference to a Scoped service. Creating a fresh scope per unit of work (each loop iteration, for instance) is the standard, safe pattern."
+    },
+    {
+      "type": "mcq",
+      "question": "What does `Channel<T>` provide that a plain `List<T>` doesn't, for a producer/consumer scenario?",
+      "options": [
+        "Nothing, they're interchangeable",
+        "Thread-safe, async-friendly writing and reading — multiple producers can safely write concurrently, and a consumer can `await foreach` items as they arrive",
+        "Channel<T> is just a faster List<T>",
+        "Channel<T> only works with strings"
+      ],
+      "answer": 1,
+      "explanation": "A List<T> isn't safe for concurrent access and has no built-in way to asynchronously wait for new items to appear. Channel<T> is purpose-built for exactly this: safe concurrent writes and an async stream of reads."
+    },
+    {
+      "type": "mcq",
+      "question": "Why might an API endpoint write to a Channel<T> instead of doing slow work (like sending an email) directly?",
+      "options": [
+        "It's required syntax for all endpoints",
+        "It lets the endpoint respond immediately after queuing the work, while a separate background worker actually performs the slow operation at its own pace",
+        "Channels make the email send faster",
+        "There's no benefit"
+      ],
+      "answer": 1,
+      "explanation": "This decouples 'the request is queued' from 'the work is done' — the caller gets a fast response, and the actual (possibly slow) work happens asynchronously in the background, processed by a BackgroundService reading from the channel."
+    },
+    {
+      "type": "tf",
+      "question": "`PeriodicTimer` combined with `WaitForNextTickAsync` is a purpose-built alternative to manually looping with `Task.Delay` for recurring, scheduled work.",
+      "answer": true,
+      "explanation": "PeriodicTimer is specifically designed for 'run this every N seconds/minutes' scenarios, and WaitForNextTickAsync cleanly returns false on cancellation, ending the loop without extra manual checks."
+    }
+  ]
+}

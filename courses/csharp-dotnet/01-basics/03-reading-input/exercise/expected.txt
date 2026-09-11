@@ -1,0 +1,4 @@
+Customer name: Item: Price: Quantity: 
+Order for Sara
+4 x Notebook at 12.5 each
+Total: 50

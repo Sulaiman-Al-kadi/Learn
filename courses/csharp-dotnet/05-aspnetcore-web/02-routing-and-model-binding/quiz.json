@@ -1,0 +1,56 @@
+{
+  "title": "Quiz — Routing & Model Binding",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "Given `app.MapGet(\"/items/{id}\", (int id) => ...)`, what happens visiting `/items/abc`?",
+      "options": [
+        "id is bound to 0",
+        "The route doesn't match at all (abc isn't a valid int) — 404, before your handler runs",
+        "It throws a FormatException inside your handler",
+        "id is bound to the string \"abc\""
+      ],
+      "answer": 1,
+      "explanation": "Route parameter type conversion happens as part of matching. If the segment can't convert to the parameter's type, the route simply doesn't match, and (absent another matching route) the result is a 404 — your handler code never executes."
+    },
+    {
+      "type": "mcq",
+      "question": "Given `app.MapGet(\"/search\", (string? q, int page) => ...)` with NO route placeholders for q or page, where do they come from?",
+      "options": ["The request body", "The query string, e.g. `/search?q=cats&page=2`", "Route segments", "HTTP headers"],
+      "answer": 1,
+      "explanation": "Simple-typed parameters that don't match any {placeholder} in the route are bound from the query string by default."
+    },
+    {
+      "type": "mcq",
+      "question": "Given `app.MapPost(\"/students\", (CreateStudentRequest request) => ...)` where CreateStudentRequest is a record, where does `request` get bound from?",
+      "options": ["The query string", "A route placeholder", "The JSON request body", "It must be manually parsed"],
+      "answer": 2,
+      "explanation": "Class/record-typed parameters are, by default, bound from the JSON request body — the framework deserializes the incoming JSON into that type automatically."
+    },
+    {
+      "type": "mcq",
+      "question": "Which status code should a successful POST that creates a new resource return?",
+      "options": ["200 OK", "201 Created", "204 No Content", "400 Bad Request"],
+      "answer": 1,
+      "explanation": "201 Created is the conventional response for successfully creating a new resource, typically paired with `Results.Created(location, value)` pointing at the new resource's URL."
+    },
+    {
+      "type": "mcq",
+      "question": "In minimal APIs, how is input typically validated?",
+      "options": [
+        "Automatically — ASP.NET Core validates all inputs without any code",
+        "Manually, with guard clauses returning Results.BadRequest(...) when input is invalid",
+        "Validation isn't possible in minimal APIs",
+        "Only via a database constraint"
+      ],
+      "answer": 1,
+      "explanation": "Unlike MVC controllers (lesson 03), minimal APIs don't auto-validate — you write explicit checks (the same guard-clause pattern from Module 2's exception lesson) and return Results.BadRequest for invalid input."
+    },
+    {
+      "type": "tf",
+      "question": "A parameter's SOURCE (route, query, or body) is determined by its declared TYPE and whether its name matches a route placeholder — not by where you'd like it to come from.",
+      "answer": true,
+      "explanation": "The binding rule is mechanical: simple type + name matches a route placeholder = route; simple type + no match = query string; class/record type = request body. You design your route template and parameter types together to get the binding you want."
+    }
+  ]
+}

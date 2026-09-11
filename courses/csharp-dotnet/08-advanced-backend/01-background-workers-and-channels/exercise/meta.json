@@ -1,0 +1,1 @@
+{ "title": "Exercise: NotificationQueue with Channel<T>", "check": "test", "student": ["NotificationQueue.cs"] }

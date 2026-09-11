@@ -1,0 +1,73 @@
+{
+  "name": "learn-lab",
+  "displayName": "Learn Lab",
+  "description": "Learn to code inside VS Code: lessons, quizzes, and auto-checked exercises.",
+  "version": "0.1.0",
+  "publisher": "local",
+  "private": true,
+  "engines": { "vscode": "^1.95.0" },
+  "categories": ["Education"],
+  "activationEvents": ["workspaceContains:**/course.json"],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        { "id": "learnLab", "title": "Learn Lab", "icon": "media/icon.svg" }
+      ]
+    },
+    "views": {
+      "learnLab": [
+        { "id": "learnLab.courseTree", "name": "Course" }
+      ]
+    },
+    "commands": [
+      { "command": "learnLab.open",         "title": "Learn: Open Item" },
+      { "command": "learnLab.check",        "title": "Learn: Check Exercise",   "icon": "$(beaker)" },
+      { "command": "learnLab.hint",         "title": "Learn: Show Next Hint",   "icon": "$(lightbulb)" },
+      { "command": "learnLab.reset",        "title": "Learn: Reset Exercise",   "icon": "$(discard)" },
+      { "command": "learnLab.solution",     "title": "Learn: Show Solution" },
+      { "command": "learnLab.next",         "title": "Learn: Go To Next Item",  "icon": "$(arrow-right)" },
+      { "command": "learnLab.refresh",      "title": "Learn: Refresh",          "icon": "$(refresh)" },
+      { "command": "learnLab.resetProgress","title": "Learn: Reset All Progress" }
+    ],
+    "menus": {
+      "view/title": [
+        { "command": "learnLab.check",   "when": "view == learnLab.courseTree", "group": "navigation@1" },
+        { "command": "learnLab.hint",    "when": "view == learnLab.courseTree", "group": "navigation@2" },
+        { "command": "learnLab.next",    "when": "view == learnLab.courseTree", "group": "navigation@3" },
+        { "command": "learnLab.refresh", "when": "view == learnLab.courseTree", "group": "navigation@4" }
+      ],
+      "view/item/context": [
+        { "command": "learnLab.check",    "when": "view == learnLab.courseTree && viewItem == exercise", "group": "inline" },
+        { "command": "learnLab.hint",     "when": "view == learnLab.courseTree && viewItem == exercise", "group": "inline" },
+        { "command": "learnLab.reset",    "when": "view == learnLab.courseTree && viewItem == exercise" },
+        { "command": "learnLab.solution", "when": "view == learnLab.courseTree && viewItem == exercise" }
+      ]
+    },
+    "keybindings": [
+      { "command": "learnLab.check", "key": "ctrl+alt+enter", "when": "learnLab.hasCurrentExercise" }
+    ],
+    "configuration": {
+      "title": "Learn Lab",
+      "properties": {
+        "learnLab.dotnetPath": { "type": "string", "default": "dotnet", "description": "Path to the dotnet CLI" }
+      }
+    }
+  },
+  "scripts": {
+    "build": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --sourcemap",
+    "watch": "npm run build -- --watch",
+    "typecheck": "tsc --noEmit",
+    "package": "vsce package --no-dependencies"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "@types/vscode": "^1.95.0",
+    "@vscode/vsce": "^3",
+    "esbuild": "^0.24",
+    "typescript": "^5.6"
+  },
+  "dependencies": {
+    "marked": "^15"
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "title": "Quiz — Math & Operators",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "What prints?",
+      "code": "Console.WriteLine(9 / 2);",
+      "options": ["4.5", "4", "5", "It does not compile"],
+      "answer": 1,
+      "explanation": "Both operands are `int`, so this is integer division — the `.5` is discarded (not rounded). To get `4.5`, make one side a double: `9.0 / 2`."
+    },
+    {
+      "type": "mcq",
+      "question": "What prints?",
+      "code": "int total = 10;\nint count = 4;\ndouble average = total / count;\nConsole.WriteLine(average);",
+      "options": ["2.5", "2", "2.0", "3"],
+      "answer": 1,
+      "explanation": "`total / count` is evaluated first as `int / int` = `2`. Only *then* is it stored in the double. Declaring the result as `double` doesn't change how the division happens. Fix: `(double)total / count`."
+    },
+    {
+      "type": "mcq",
+      "question": "What is `23 % 5`?",
+      "options": ["4", "3", "4.6", "18"],
+      "answer": 1,
+      "explanation": "`23 = 4 × 5 + 3`. The remainder is `3`."
+    },
+    {
+      "type": "mcq",
+      "question": "Which expression is `true` exactly when `n` is an even number?",
+      "options": ["`n / 2 == 0`", "`n % 2 == 0`", "`n % 2 == 1`", "`n == 2`"],
+      "answer": 1,
+      "explanation": "Even numbers leave no remainder when divided by 2. `n / 2 == 0` is only true for n = 0 or 1 (integer division!)."
+    },
+    {
+      "type": "mcq",
+      "question": "What is the value of `x` at the end?",
+      "code": "int x = 5;\nx += 3;\nx *= 2;\nx--;",
+      "options": ["15", "16", "10", "11"],
+      "answer": 0,
+      "explanation": "5 → `+= 3` → 8 → `*= 2` → 16 → `--` → 15."
+    },
+    {
+      "type": "mcq",
+      "question": "What prints?",
+      "code": "int age = 16;\nbool hasTicket = true;\nConsole.WriteLine(age >= 18 && hasTicket);\nConsole.WriteLine(age >= 18 || hasTicket);",
+      "options": ["True / True", "False / True", "True / False", "False / False"],
+      "answer": 1,
+      "explanation": "`age >= 18` is false. AND needs both true → `False`. OR needs at least one true, and `hasTicket` is → `True`."
+    },
+    {
+      "type": "tf",
+      "question": "In C#, `\"cat\" == \"cat\"` is `true`.",
+      "answer": true,
+      "explanation": "C# compares strings by their contents with `==`. (In some other languages, like Java, `==` on strings compares memory addresses — not here.)"
+    }
+  ]
+}

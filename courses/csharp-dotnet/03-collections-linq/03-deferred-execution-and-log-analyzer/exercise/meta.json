@@ -1,0 +1,1 @@
+{ "title": "Capstone: Log Analyzer", "check": "test", "student": ["LogAnalyzer.cs"] }

@@ -1,0 +1,57 @@
+{
+  "title": "Quiz — Making Decisions",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "What prints?",
+      "code": "int n = 75;\nif (n >= 50)\n{\n    Console.WriteLine(\"pass\");\n}\nelse if (n >= 70)\n{\n    Console.WriteLine(\"good\");\n}\nelse\n{\n    Console.WriteLine(\"fail\");\n}",
+      "options": ["pass", "good", "pass and good", "fail"],
+      "answer": 0,
+      "explanation": "The first true condition wins. `75 >= 50` is true, so `pass` prints and the rest is skipped — even though `75 >= 70` is also true. To make `good` reachable, the `>= 70` check must come first."
+    },
+    {
+      "type": "mcq",
+      "question": "What prints?",
+      "code": "int x = 3;\nif (x > 5)\n    Console.WriteLine(\"A\");\n    Console.WriteLine(\"B\");",
+      "options": ["Nothing", "A", "B", "A and B"],
+      "answer": 2,
+      "explanation": "Without braces, only the *first* statement belongs to the `if`. The second `WriteLine` is indented but that means nothing to C# — it always runs. This is why you always use `{ }`."
+    },
+    {
+      "type": "mcq",
+      "question": "What is wrong here?",
+      "code": "if (age >= 18);\n{\n    Console.WriteLine(\"adult\");\n}",
+      "options": [
+        "Nothing, it works as intended",
+        "The `;` ends the `if` with an empty body, so the block ALWAYS runs",
+        "It doesn't compile",
+        "The block never runs"
+      ],
+      "answer": 1,
+      "explanation": "`if (age >= 18);` is a complete (useless) statement: 'if true, do nothing'. The `{ ... }` after it is just a normal block that always executes. The compiler only gives a warning."
+    },
+    {
+      "type": "mcq",
+      "question": "The user types `YES`. What prints?",
+      "code": "string a = Console.ReadLine() ?? \"\";\nif (a == \"yes\")\n{\n    Console.WriteLine(\"ok\");\n}\nelse\n{\n    Console.WriteLine(\"no\");\n}",
+      "options": ["ok", "no", "It crashes", "Nothing"],
+      "answer": 1,
+      "explanation": "String comparison is case-sensitive: `\"YES\" == \"yes\"` is false. Use `a.ToLower() == \"yes\"` to accept any casing."
+    },
+    {
+      "type": "mcq",
+      "question": "What is `label`?",
+      "code": "int stock = 0;\nstring label = stock > 0 ? \"in stock\" : \"sold out\";",
+      "options": ["`\"in stock\"`", "`\"sold out\"`", "`true`", "It does not compile"],
+      "answer": 1,
+      "explanation": "`stock > 0` is false, so the conditional operator picks the value after the `:` — `\"sold out\"`."
+    },
+    {
+      "type": "multi",
+      "question": "Which conditions are valid inside `if ( ... )`? (select all that apply)",
+      "options": ["`x > 5`", "`x = 5`", "`name == \"Ali\" && age >= 18`", "`isReady`", "`5`"],
+      "answer": [0, 2, 3],
+      "explanation": "A condition must be a `bool`. `x > 5` and the `&&` expression are bools; `isReady` is already a bool variable. `x = 5` is an assignment (an int, and a bug). `5` is an int — C# won't treat numbers as true/false."
+    }
+  ]
+}

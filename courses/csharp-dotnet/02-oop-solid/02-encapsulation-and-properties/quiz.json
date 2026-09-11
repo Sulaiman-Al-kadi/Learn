@@ -1,0 +1,74 @@
+{
+  "title": "Quiz — Encapsulation & Properties",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "What's the main problem with `public double Balance;` as a plain field?",
+      "options": [
+        "Fields are slower than properties",
+        "Nothing stops external code from setting it to an invalid value like -1000",
+        "Fields can't be read from outside the class",
+        "Fields require a constructor"
+      ],
+      "answer": 1,
+      "explanation": "A public field has no way to run validation logic — any code can assign anything to it directly. Properties let you run code (like a range check) whenever the value is read or written."
+    },
+    {
+      "type": "mcq",
+      "question": "Given `public double Balance { get; private set; }`, which line fails to compile OUTSIDE the class?",
+      "options": [
+        "`Console.WriteLine(acc.Balance);`",
+        "`double x = acc.Balance;`",
+        "`acc.Balance = 500;`",
+        "None of these fail"
+      ],
+      "answer": 2,
+      "explanation": "`private set` means only code inside the class itself can assign to the property. Reading (`get`) is still public. Assigning from outside the class is a compile error."
+    },
+    {
+      "type": "mcq",
+      "question": "What prints?",
+      "code": "public class Rect\n{\n    public double W { get; set; }\n    public double H { get; set; }\n    public double Area => W * H;\n}\n\nvar r = new Rect { W = 3, H = 4 };\nConsole.WriteLine(r.Area);\nr.W = 10;\nConsole.WriteLine(r.Area);",
+      "options": ["12 / 12", "12 / 40", "0 / 0", "It does not compile"],
+      "answer": 1,
+      "explanation": "`Area` is a COMPUTED property — it recalculates `W * H` every time it's read, never stores a stale value. First read: 3×4=12. After W changes to 10: 10×4=40."
+    },
+    {
+      "type": "mcq",
+      "question": "What's the difference between `{ get; set; }` and `{ get; init; }`?",
+      "options": [
+        "No difference, they're aliases",
+        "`init` can only be assigned during object construction (including an object initializer); `set` can be assigned any time",
+        "`init` is for value types, `set` is for reference types",
+        "`init` makes the property read-only forever, including during construction"
+      ],
+      "answer": 1,
+      "explanation": "`init` allows assignment only during construction (e.g. `new Order { Id = \"1\" }`), then locks. `set` allows assignment at any point in the object's lifetime."
+    },
+    {
+      "type": "mcq",
+      "question": "You want to default to the simplest property that has no custom logic. Which do you write?",
+      "options": [
+        "A full property with a private backing field",
+        "An auto-property: `public string Name { get; set; }`",
+        "A public field: `public string Name;`",
+        "A computed property with `=>`"
+      ],
+      "answer": 1,
+      "explanation": "Auto-properties are the default choice — no extra ceremony, but still a property (not a field), so you can later add validation logic without breaking anyone who uses it."
+    },
+    {
+      "type": "mcq",
+      "question": "Which access modifier allows access from the SAME class only, not even from classes that inherit from it?",
+      "options": ["`public`", "`protected`", "`private`", "`internal`"],
+      "answer": 2,
+      "explanation": "`private` is the tightest — only code written inside that exact class. `protected` extends access to derived classes too (next lesson)."
+    },
+    {
+      "type": "tf",
+      "question": "Changing a public field to a property later, without changing its name or type, breaks code that uses `obj.Field = value;` or `Console.WriteLine(obj.Field);`.",
+      "answer": false,
+      "explanation": "This is one of the reasons C# properties look like fields from the outside — `obj.Name = value;` and `Console.WriteLine(obj.Name);` work identically whether `Name` is a field or a property. You CAN swap a field for a property later without breaking callers — which is exactly why 'always use properties, even auto-properties, instead of public fields' is standard advice."
+    }
+  ]
+}

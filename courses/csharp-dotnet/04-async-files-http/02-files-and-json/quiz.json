@@ -1,0 +1,66 @@
+{
+  "title": "Quiz — Files & JSON",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "What does `JsonSerializer.Serialize(student)` do?",
+      "options": [
+        "Reads a JSON file from disk",
+        "Converts the `student` C# object into a JSON text string",
+        "Converts a JSON string into a `student` object",
+        "Saves the object directly to a file"
+      ],
+      "answer": 1,
+      "explanation": "Serialize goes FROM a C# object TO JSON text. It just produces a string in memory — you'd still need File.WriteAllText to save it."
+    },
+    {
+      "type": "mcq",
+      "question": "Why is `Deserialize<T>` a generic method?",
+      "options": [
+        "It isn't generic",
+        "The type parameter T tells the method what shape of object to build from the JSON text — the same method works for any target type",
+        "T stands for 'text'",
+        "Generics are required by JSON syntax"
+      ],
+      "answer": 1,
+      "explanation": "Just like Module 2's Stack<T>, one generic method definition works for `Deserialize<Student>`, `Deserialize<List<int>>`, or any other type — T is filled in at the call site."
+    },
+    {
+      "type": "mcq",
+      "question": "What's the return type of `JsonSerializer.Deserialize<Student>(json)`, and why?",
+      "options": [
+        "`Student`, because it always succeeds",
+        "`Student?` (nullable) — the JSON might not match the expected shape, so you must account for that",
+        "`string`, the raw JSON",
+        "`object`"
+      ],
+      "answer": 1,
+      "explanation": "Deserialize can return null if the JSON represents null, or in some mismatch scenarios — the nullable return type forces you to consider that case, same philosophy as TryParse and FirstOrDefault."
+    },
+    {
+      "type": "mcq",
+      "question": "Why use `Path.Combine(folder, fileName)` instead of `folder + \"/\" + fileName`?",
+      "options": [
+        "No real difference",
+        "Path.Combine uses the correct separator for whatever OS the program runs on, avoiding hardcoded assumptions",
+        "Path.Combine is faster",
+        "String concatenation doesn't work with file paths"
+      ],
+      "answer": 1,
+      "explanation": "Windows uses backslashes, Unix-like systems use forward slashes. Path.Combine handles this correctly regardless of platform, instead of hardcoding one separator."
+    },
+    {
+      "type": "mcq",
+      "question": "What exception does malformed JSON throw during Deserialize?",
+      "options": ["FormatException", "JsonException", "ArgumentException", "IOException"],
+      "answer": 1,
+      "explanation": "System.Text.Json throws JsonException for malformed or unparseable JSON — catch it the same way as any other exception (Module 2, lesson 07)."
+    },
+    {
+      "type": "tf",
+      "question": "File.ReadAllText and File.ReadAllTextAsync do fundamentally different things to the file's content — Async reads it differently.",
+      "answer": false,
+      "explanation": "They read the exact same content. The only difference is HOW they wait — ReadAllTextAsync doesn't block the calling thread while reading, following the same async/await pattern from lesson 01."
+    }
+  ]
+}

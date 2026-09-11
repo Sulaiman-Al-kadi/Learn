@@ -1,0 +1,59 @@
+{
+  "title": "Quiz — Generics",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "What does `T` mean in `public class Box<T> { public T Value; }`?",
+      "options": [
+        "A specific built-in type called T",
+        "A type parameter — a placeholder filled in with a real type when the class is used",
+        "It means the class only works with strings",
+        "A typo — it should be a real type name"
+      ],
+      "answer": 1,
+      "explanation": "`T` is a placeholder. `Box<int>` and `Box<string>` are both valid, independent uses of the same class definition, with `T` replaced by `int` or `string` respectively."
+    },
+    {
+      "type": "mcq",
+      "question": "What's wrong with this?",
+      "code": "Box<int> box = new Box<int>(42);\nbox.Value = \"oops\";",
+      "options": ["Nothing, it's fine", "Compile error — box.Value must be an int, since box is a Box<int>", "It compiles but crashes at runtime", "Box<int> doesn't have a Value property"],
+      "answer": 1,
+      "explanation": "Once `T` is fixed to `int` for this particular `Box<int>`, `Value` is strictly an `int` property. Generics are still fully type-checked by the compiler — that's the whole benefit over using `object` for everything."
+    },
+    {
+      "type": "mcq",
+      "question": "Why does `Max<T>(T a, T b)` need `where T : IComparable<T>`?",
+      "code": "public static T Max<T>(T a, T b) => a.CompareTo(b) > 0 ? a : b;",
+      "options": [
+        "It doesn't need it, this compiles as-is",
+        "Without the constraint, the compiler doesn't know T has a CompareTo method — the constraint requires T to implement IComparable<T>, which guarantees CompareTo exists",
+        "Constraints are required on every generic method",
+        "IComparable<T> makes the method run faster"
+      ],
+      "answer": 1,
+      "explanation": "Without a constraint, the compiler only knows `T` could be ANY type, so it can't assume `.CompareTo()` exists. The `where` clause promises 'T will always implement IComparable<T>', which unlocks calling `.CompareTo()` in the body."
+    },
+    {
+      "type": "mcq",
+      "question": "What prints?",
+      "code": "var s = new Stack<int>();\ns.Push(1);\ns.Push(2);\ns.Push(3);\nConsole.WriteLine(s.Pop());\nConsole.WriteLine(s.Pop());",
+      "options": ["1\\n2", "3\\n2", "1\\n3", "3\\n1"],
+      "answer": 1,
+      "explanation": "A stack is LIFO — Last In, First Out. Push order was 1,2,3; Pop returns the most recently pushed first: 3, then 2."
+    },
+    {
+      "type": "mcq",
+      "question": "What does `default(T)` evaluate to when `T` is `bool`? When `T` is `string`?",
+      "options": ["true / \"\"", "false / null", "0 / \"\"", "null / null"],
+      "answer": 1,
+      "explanation": "`default` gives each type's zero-value: value types get their natural zero (`false` for bool, `0` for int), reference types (like `string`) get `null`."
+    },
+    {
+      "type": "tf",
+      "question": "`Pair<TFirst, TSecond>` can have `TFirst` and `TSecond` be the same actual type when used, e.g. `Pair<int, int>`.",
+      "answer": true,
+      "explanation": "Type parameters are independent placeholders — nothing stops you from substituting the same real type for both when you use the generic class."
+    }
+  ]
+}

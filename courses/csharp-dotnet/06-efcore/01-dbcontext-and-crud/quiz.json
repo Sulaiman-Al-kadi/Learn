@@ -1,0 +1,72 @@
+{
+  "title": "Quiz — DbContext & CRUD",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "What is a `DbSet<Student>` on your `DbContext`?",
+      "options": [
+        "A plain in-memory list, unrelated to the database",
+        "A representation of the Students TABLE — querying it with LINQ queries the table, adding to it stages an insert",
+        "A configuration setting",
+        "A single Student row"
+      ],
+      "answer": 1,
+      "explanation": "DbSet<T> is EF Core's bridge between your C# code and a database table — LINQ methods on it translate to SQL queries against that table."
+    },
+    {
+      "type": "mcq",
+      "question": "What actually happens when you call `context.Students.Add(student)` alone, without calling `SaveChangesAsync()`?",
+      "options": [
+        "The student is immediately inserted into the database",
+        "Nothing hits the database yet — the addition is only staged in memory until SaveChangesAsync runs",
+        "It throws an exception",
+        "The student is inserted, but Id is not generated"
+      ],
+      "answer": 1,
+      "explanation": "Add() only registers the new entity with the context's change tracker. No SQL runs until SaveChangesAsync() is called, which is when EF Core actually generates and executes the INSERT."
+    },
+    {
+      "type": "mcq",
+      "question": "Why does this update the database, even though there's no explicit 'update' call?",
+      "code": "var student = await context.Students.FindAsync(1);\nstudent.Grade = 95;\nawait context.SaveChangesAsync();",
+      "options": [
+        "It doesn't — this code does nothing",
+        "EF Core's change tracking noticed the property changed on a tracked entity, and SaveChangesAsync generates the appropriate UPDATE",
+        "FindAsync automatically saves changes",
+        "You must call context.Update(student) explicitly for this to work"
+      ],
+      "answer": 1,
+      "explanation": "Once loaded via FindAsync, the entity is TRACKED. Any property change is noticed by EF Core's change tracker, and SaveChangesAsync compares tracked entities' current state to their original state, generating UPDATE statements for what changed."
+    },
+    {
+      "type": "mcq",
+      "question": "What's the purpose of a migration (`dotnet ef migrations add`)?",
+      "options": [
+        "It runs your unit tests",
+        "It generates a versioned script describing how to change the real database schema to match your current entity classes",
+        "It deletes the database",
+        "It's an alternative to DbContext"
+      ],
+      "answer": 1,
+      "explanation": "Migrations track schema changes over time, generated from comparing your entity classes to the previous migration state — letting the database evolve alongside your code with a repeatable, versioned history."
+    },
+    {
+      "type": "mcq",
+      "question": "Why use `ToListAsync()`/`FirstOrDefaultAsync()` instead of the synchronous `ToList()`/`FirstOrDefault()` you learned in Module 3, when querying a DbContext?",
+      "options": [
+        "They behave completely differently",
+        "A database query is I/O — the async versions don't block the thread while waiting for the database to respond (Module 4, lesson 01)",
+        "The synchronous versions don't exist for DbSet",
+        "Async versions are only for writes, never reads"
+      ],
+      "answer": 1,
+      "explanation": "Same async/await philosophy from Module 4: waiting on a database round-trip is exactly the kind of I/O wait that async exists to handle without blocking a thread."
+    },
+    {
+      "type": "tf",
+      "question": "The LINQ methods you learned in Module 3 (Where, OrderBy, FirstOrDefault, ...) are a completely different API from the ones used to query a DbContext.",
+      "answer": false,
+      "explanation": "They're the SAME LINQ methods — EF Core translates the same Where/OrderBy/Select chains you already know into SQL behind the scenes. This is exactly why Module 3 was worth learning thoroughly before this module."
+    }
+  ]
+}

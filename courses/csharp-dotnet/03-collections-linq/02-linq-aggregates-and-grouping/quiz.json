@@ -1,0 +1,68 @@
+{
+  "title": "Quiz — LINQ Aggregates & Grouping",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "What does `students.Max(s => s.Score)` return, vs `students.Max()`?",
+      "options": [
+        "Both do the same thing",
+        "Max(s => s.Score) returns the largest Score value; Max() alone would fail to compile since Student has no natural ordering",
+        "Max(s => s.Score) returns the whole Student object with the largest score",
+        "Max() returns a list of all maximum values"
+      ],
+      "answer": 1,
+      "explanation": "The selector lambda tells LINQ WHICH value to compare across objects. Without it, `Max()` doesn't know how to compare two Student objects, and Student doesn't implement IComparable — it won't compile."
+    },
+    {
+      "type": "mcq",
+      "question": "What's the difference between `First(predicate)` and `FirstOrDefault(predicate)` when nothing matches?",
+      "options": [
+        "No difference",
+        "First throws InvalidOperationException; FirstOrDefault returns a safe default (0/null/false) instead",
+        "First returns null; FirstOrDefault throws",
+        "FirstOrDefault is slower but otherwise identical"
+      ],
+      "answer": 1,
+      "explanation": "Same philosophy as int.Parse vs TryParse — First is for 'this MUST exist or something is badly wrong'; FirstOrDefault is for when 'not found' is a normal, expected outcome you'll check for."
+    },
+    {
+      "type": "mcq",
+      "question": "What prints?",
+      "code": "List<int> nums = [4, 9, 15, 22];\nConsole.WriteLine(nums.Any(n => n > 20));\nConsole.WriteLine(nums.All(n => n > 20));",
+      "options": ["True / True", "False / False", "True / False", "False / True"],
+      "answer": 2,
+      "explanation": "Any() is true if AT LEAST ONE matches (22 > 20 — true). All() requires EVERY element to match (4 and 9 don't — false)."
+    },
+    {
+      "type": "mcq",
+      "question": "What does `.OrderByDescending(s => s.Score).ThenBy(s => s.Name)` do?",
+      "options": [
+        "Sorts by Name only, ignoring Score",
+        "Sorts by Score descending; when two students have the SAME Score, breaks the tie by Name ascending",
+        "Sorts by Score, then re-sorts the whole thing by Name, discarding the Score order",
+        "It's invalid — you can't chain OrderBy with ThenBy"
+      ],
+      "answer": 1,
+      "explanation": "ThenBy is a SECONDARY sort key, only applied to break ties left over from the primary OrderBy/OrderByDescending. Elements with different Scores are unaffected by the ThenBy."
+    },
+    {
+      "type": "mcq",
+      "question": "After `var groups = students.GroupBy(s => s.Grade);`, what does each element of `groups` contain?",
+      "options": [
+        "Just a single Student",
+        "A `.Key` (the grade) plus all the Student objects that share that grade — itself enumerable",
+        "A List<string> of names",
+        "A single aggregated count"
+      ],
+      "answer": 1,
+      "explanation": "Each group from GroupBy has a `.Key` property (the value the lambda returned) and is itself an IEnumerable<T> of every element that shared that key — you can foreach, Select, Count, etc. on it."
+    },
+    {
+      "type": "mcq",
+      "question": "How do you get 'page 2' of results, 10 per page (i.e., results 11-20)?",
+      "options": ["`.Take(10).Skip(10)`", "`.Skip(10).Take(10)`", "`.Take(20)`", "`.Skip(20)`"],
+      "answer": 1,
+      "explanation": "Skip(10) discards the first 10 (page 1), then Take(10) keeps the next 10 (page 2's worth). Order matters: Take before Skip would give a different, usually wrong, result."
+    }
+  ]
+}

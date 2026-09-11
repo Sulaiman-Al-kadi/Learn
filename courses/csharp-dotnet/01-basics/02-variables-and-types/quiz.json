@@ -1,0 +1,54 @@
+{
+  "title": "Quiz — Variables & Types",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "What does this print?",
+      "code": "int score = 10;\nscore = score + 5;\nConsole.WriteLine(score);",
+      "options": ["10", "15", "score + 5", "It does not compile"],
+      "answer": 1,
+      "explanation": "`=` is assignment, not equality. `score = score + 5` means: compute `score + 5` (15) and store it back into `score`."
+    },
+    {
+      "type": "mcq",
+      "question": "Which line has an error?",
+      "options": [
+        "`int count = 3;`",
+        "`double temp = 36.6;`",
+        "`string city = 'Riyadh';`",
+        "`bool done = false;`"
+      ],
+      "answer": 2,
+      "explanation": "Strings use **double** quotes. Single quotes are for `char` — exactly one character. `'Riyadh'` is 6 characters, so it's an error."
+    },
+    {
+      "type": "mcq",
+      "question": "What does this print?",
+      "code": "string name = \"Omar\";\nConsole.WriteLine(\"Hello {name}\");",
+      "options": ["Hello Omar", "Hello {name}", "Hello name", "It does not compile"],
+      "answer": 1,
+      "explanation": "No `$` before the string, so the braces are just ordinary characters. You need `$\"Hello {name}\"` for interpolation."
+    },
+    {
+      "type": "mcq",
+      "question": "After these lines, what is the type of `x`?",
+      "code": "var x = 7;\nx = x * 2;",
+      "options": ["`var`", "`int`", "`double`", "Unknown until the program runs"],
+      "answer": 1,
+      "explanation": "`var` asks the compiler to infer the type from `7`, which is an `int`. From then on `x` is an `int` — permanently. `var` is not a type of its own."
+    },
+    {
+      "type": "multi",
+      "question": "Which of these are valid variable names in C#? (select all that apply)",
+      "options": ["`firstName`", "`2ndPlace`", "`total_price`", "`string`", "`isReady`"],
+      "answer": [0, 2, 4],
+      "explanation": "Names can't start with a digit (`2ndPlace`) and can't be a keyword (`string`). Underscores are allowed, though camelCase (`totalPrice`) is the convention."
+    },
+    {
+      "type": "tf",
+      "question": "This compiles: `int n = 5; n = \"five\";`",
+      "answer": false,
+      "explanation": "`n` was declared as `int`. C# is statically typed — you can't later assign a string to it. The compiler rejects the second line."
+    }
+  ]
+}
