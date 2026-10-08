@@ -127,6 +127,13 @@ export class DotnetRunner implements Runner {
     if (!m) {
       // A genuine all-pass run always prints the "Failed: X, Passed: Y, ..." summary line.
       // No summary at all (e.g. zero [Fact]s discovered) must never read as a pass, regardless of exit code.
+      // Restore/MSBuild errors (offline NuGet, path too long, locked files) also end here — report those as-is
+      // so the learner doesn't go hunting for a missing [Fact].
+      const toolError = out.split('\n').find(l => /:\s*error(\s+[A-Z]+\d+)?\s*:/.test(l));
+      if (toolError) {
+        const msg = toolError.replace(/^.*?:\s*error(\s+[A-Z]+\d+)?\s*:\s*/, '').replace(/\s*\[[^\]]*\]$/, '').trim();
+        return { passed: false, summary: `Build failed before any test ran — ${msg}`, details: out };
+      }
       return { passed: false, summary: 'No tests were found — write at least one [Fact].', details: out };
     }
     const [, failed, passed, , total] = m.map(Number);

@@ -57,4 +57,5 @@ Re-run `npm run setup` (from `extension/`), then reload the window again — VS 
 | `npm run package` fails with `ReferenceError: File is not defined` | Node.js is too old — install Node 20.18 or newer |
 | `dotnet: command not found` | Install the .NET 10 SDK, restart your terminal/VS Code |
 | First exercise check takes forever / times out | Just NuGet restoring — check your internet connection, then retry |
+| Check says *"exceeds the OS max path limit"* or *"The filename or extension is too long"* (EF Core / ASP.NET Core exercises) | Windows' 260-character path limit — the repo folder path must be under ~75 characters. Clone somewhere short, e.g. `C:\src\Learn` |
 | Extension doesn't reflect a source change | You edited `.ts` but didn't rebuild/repackage/reinstall — see above |
