@@ -73,8 +73,6 @@ Drop a new folder following the layout above — no code changes needed. Exercis
 ## Rebuilding the extension (after changing `extension/src`)
 ```powershell
 cd extension
-npm run build
-npx vsce package --no-dependencies --allow-missing-repository
-code --install-extension learn-lab-0.1.0.vsix --force
+npm run setup      # install deps → build → package learn-lab.vsix → install into VS Code
 ```
 Then `Developer: Reload Window` in VS Code.

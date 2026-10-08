@@ -149,8 +149,13 @@ export function getRunner(language: string, dotnetPath: () => string): Runner {
 
 export function copyDir(from: string, to: string) {
   fs.mkdirSync(to, { recursive: true });
+  const now = new Date();
   for (const e of fs.readdirSync(from, { withFileTypes: true })) {
     const src = path.join(from, e.name), dst = path.join(to, e.name);
-    if (e.isDirectory()) copyDir(src, dst); else fs.copyFileSync(src, dst);
+    if (e.isDirectory()) { copyDir(src, dst); continue; }
+    fs.copyFileSync(src, dst);
+    // copyFileSync keeps the source's (old) mtime on Windows. dotnet's incremental build would then see the
+    // reset file as older than the last build and skip compiling — re-running the previous (passing) code.
+    fs.utimesSync(dst, now, now);
   }
 }
