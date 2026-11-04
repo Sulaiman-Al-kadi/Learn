@@ -24,17 +24,17 @@
         "`Console.WriteLine('15');`"
       ],
       "answer": 1,
-      "explanation": "Without quotes, `10 + 5` is math and evaluates to `15`. With quotes it's just the text `10 + 5`. Option 3 joins two strings into `150`. Single quotes are for one character only, so `'15'` is an error."
+      "explanation": "Without quotes, `10 + 5` is math and evaluates to `15`. With quotes it's just the text `10 + 5`. `\"15\" + \"0\"` joins two strings into `150`. Single quotes are for one character only, so `'15'` is an error."
     },
     {
       "type": "mcq",
       "question": "What is wrong with this line?",
       "code": "Console.WriteLine(\"Path: C:\\Learn\")",
       "options": [
-        "Nothing, it works",
-        "Missing semicolon only",
-        "`\\L` is not a valid escape sequence only",
-        "Both: missing semicolon AND `\\L` is an invalid escape"
+        "Nothing, it works exactly as written",
+        "Only the semicolon is missing from the end",
+        "Only `\\L`, which is not a valid escape sequence",
+        "Two things: the semicolon and `\\L`"
       ],
       "answer": 3,
       "explanation": "Two errors. Every statement needs `;`, and inside a normal string `\\` starts an escape sequence — `\\L` doesn't exist. Fix: `Console.WriteLine(\"Path: C:\\\\Learn\");` or use `@\"Path: C:\\Learn\"`."
@@ -43,7 +43,12 @@
       "type": "mcq",
       "question": "How many lines does this print?",
       "code": "Console.WriteLine(\"a\\nb\\nc\");",
-      "options": ["1", "2", "3", "It does not compile"],
+      "options": [
+        "1",
+        "2",
+        "3",
+        "It does not compile"
+      ],
       "answer": 2,
       "explanation": "Each `\\n` inside the string is a newline, so `a`, `b`, `c` end up on three separate lines — even though it's a single `WriteLine` call."
     },

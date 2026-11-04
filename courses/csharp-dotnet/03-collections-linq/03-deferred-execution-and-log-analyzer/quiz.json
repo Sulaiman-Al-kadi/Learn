@@ -6,9 +6,9 @@
       "question": "When does the lambda inside `.Where(...)` actually execute?",
       "options": [
         "Immediately, the instant `.Where(...)` is called",
-        "Only when the query is enumerated — a foreach, `.ToList()`, `.Count()`, etc.",
-        "Never, unless you call `.Run()`",
-        "At compile time"
+        "Only when the query is enumerated",
+        "Never, unless you call `.Run()` on the query",
+        "At compile time, before the program starts"
       ],
       "answer": 1,
       "explanation": "LINQ is lazy (deferred execution). `.Where(...)` just builds a description of the query. The lambda runs element-by-element only when something actually enumerates the result."
@@ -17,10 +17,10 @@
       "type": "mcq",
       "question": "What's the risk of writing `var q = list.Where(x => Expensive(x)); var a = q.Count(); var b = q.ToList();`?",
       "options": [
-        "None, this is efficient",
-        "Expensive() runs TWICE — once for Count(), once again for ToList() — because each enumeration re-runs the whole query from scratch",
-        "It doesn't compile",
-        "q gets cached automatically after the first use"
+        "None, this is efficient because `q` is reused",
+        "`Expensive()` runs again for each enumeration",
+        "It doesn't compile, `q` can only be used once",
+        "`q` gets cached automatically after the first use"
       ],
       "answer": 1,
       "explanation": "Every enumeration of an un-materialized LINQ query re-runs it. Calling both Count() and ToList() on the same query variable runs the (possibly expensive) Where lambda twice over the whole source."
@@ -29,10 +29,10 @@
       "type": "mcq",
       "question": "What's the fix for the problem in the previous question?",
       "options": [
-        "Call `.ToList()` once, store the result, and use the resulting List for both the count and the items",
-        "Call `.Where()` twice instead",
-        "There's no fix, this is unavoidable",
-        "Use `foreach` instead of `.Count()`"
+        "Call `.ToList()` once and reuse the list",
+        "Call `.Where()` twice instead of reusing `q`",
+        "There's no fix, this cost is unavoidable",
+        "Use `foreach` instead of calling `.Count()`"
       ],
       "answer": 0,
       "explanation": "Materialize once: `var list = list.Where(x => Expensive(x)).ToList(); var a = list.Count; var b = list;` — now Expensive() only ever runs once per element."
@@ -40,7 +40,12 @@
     {
       "type": "mcq",
       "question": "What does `tags.Distinct().ToList()` do to `[\"a\", \"b\", \"a\", \"c\", \"b\"]`?",
-      "options": ["[\"a\", \"b\", \"c\"]", "[\"a\", \"a\", \"b\", \"b\", \"c\"]", "[\"c\", \"b\", \"a\"]", "3"],
+      "options": [
+        "[\"a\", \"b\", \"c\"]",
+        "[\"a\", \"a\", \"b\", \"b\", \"c\"]",
+        "[\"c\", \"b\", \"a\"]",
+        "3"
+      ],
       "answer": 0,
       "explanation": "Distinct removes duplicates, keeping the first occurrence of each value and preserving original order: a, then b, then c."
     },

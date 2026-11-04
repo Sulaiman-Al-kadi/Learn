@@ -1,0 +1,50 @@
+{
+  "title": "Quiz — Memory",
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "What does this print?",
+      "code": "int a = 5;\nint b = a;\nb = 8;\nConsole.WriteLine(a);",
+      "options": ["5", "8", "13", "It does not compile"],
+      "answer": 0,
+      "explanation": "`int` is a value type, so `b = a` copies the value. Changing `b` afterwards doesn't touch `a`."
+    },
+    {
+      "type": "mcq",
+      "question": "What does this print?",
+      "code": "int[] a = [5, 6];\nint[] b = a;\nb[0] = 8;\nConsole.WriteLine(a[0]);",
+      "options": ["5", "6", "8", "It throws an exception"],
+      "answer": 2,
+      "explanation": "Arrays are reference types. `b = a` copies the address, so `a` and `b` are two labels on one array."
+    },
+    {
+      "type": "mcq",
+      "question": "What does this print?",
+      "code": "int[] a = [1, 2];\nint[] b = [1, 2];\nConsole.WriteLine(a == b);",
+      "options": ["True", "False", "1", "It does not compile"],
+      "answer": 1,
+      "explanation": "For arrays, `==` asks whether both variables point at the same object. These are two separate arrays that happen to hold equal values."
+    },
+    {
+      "type": "mcq",
+      "question": "After this runs, what are `n` and `nums[0]`?",
+      "code": "void Change(int n, int[] nums)\n{\n    n = 100;\n    nums[0] = 100;\n}\n\nint n = 1;\nint[] nums = [1];\nChange(n, nums);",
+      "options": ["`n` is 100, `nums[0]` is 100", "`n` is 100, `nums[0]` is 1", "`n` is 1, `nums[0]` is 1", "`n` is 1, `nums[0]` is 100"],
+      "answer": 3,
+      "explanation": "The method gets a copy of the `int`, so the caller's `n` is safe. It also gets a copy of the array's address, which still leads to the caller's array."
+    },
+    {
+      "type": "tf",
+      "question": "`s += \"!\"` changes the existing string object in place.",
+      "answer": false,
+      "explanation": "Strings are immutable. `+=` builds a new string and points `s` at it. Any other variable still pointing at the old string sees no change."
+    },
+    {
+      "type": "mcq",
+      "question": "Which job does the garbage collector **not** do for you?",
+      "options": ["Closing an open file on time", "Reclaiming an array nothing points to", "Finding unreachable objects on the heap", "Freeing memory you never freed yourself"],
+      "answer": 0,
+      "explanation": "The GC manages memory only. Files and connections need `Dispose()`, which is what `using` calls for you."
+    }
+  ]
+}

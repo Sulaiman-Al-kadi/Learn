@@ -5,10 +5,10 @@
       "type": "mcq",
       "question": "What does `response.IsSuccessStatusCode` check?",
       "options": [
-        "Whether the JSON body is valid",
-        "Whether the HTTP status code is in the 2xx range (200-299)",
-        "Whether the request timed out",
-        "Whether the client has internet access"
+        "Whether the JSON body is valid and can be read",
+        "Whether the status code is in the 2xx range",
+        "Whether the request timed out before a response",
+        "Whether the client has internet access right now"
       ],
       "answer": 1,
       "explanation": "IsSuccessStatusCode is true for 2xx status codes (200 OK, 201 Created, etc.) and false for 4xx (client errors, e.g. 404 Not Found) and 5xx (server errors)."
@@ -18,9 +18,9 @@
       "question": "What does `ReadFromJsonAsync<WeatherResult>()` do that `ReadAsStringAsync()` + `JsonSerializer.Deserialize<WeatherResult>()` also accomplishes, just combined?",
       "options": [
         "Nothing, they do completely different things",
-        "Reads the HTTP response body AND deserializes it into a WeatherResult, in one awaited call",
-        "Only reads the body as text, never deserializes",
-        "Only works with XML, not JSON"
+        "Reads the body and deserializes it in one call",
+        "Only reads the body as text, never deserializes it",
+        "Only works with XML responses, not with JSON ones"
       ],
       "answer": 1,
       "explanation": "ReadFromJsonAsync<T> is a convenience method that combines reading the response content and JSON-deserializing it into one step, instead of two separate calls."
@@ -29,10 +29,10 @@
       "type": "mcq",
       "question": "Why does `WeatherClient` take an `HttpClient` through its constructor instead of creating `new HttpClient()` inside itself?",
       "options": [
-        "It's required syntax",
-        "Dependency Inversion (Module 2) — this lets tests substitute a fake HttpMessageHandler and verify behavior without making real network calls",
+        "It's required syntax for any class using HTTP",
+        "So tests can pass in a fake handler",
         "HttpClient can only be created once per program",
-        "It makes the code run faster"
+        "It makes the code run faster on every request"
       ],
       "answer": 1,
       "explanation": "Constructor injection means WeatherClient depends on whatever HttpClient it's given — including one wired to a fake handler in tests — rather than being permanently welded to real network access."

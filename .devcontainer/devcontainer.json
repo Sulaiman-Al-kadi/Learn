@@ -1,0 +1,14 @@
+{
+  "name": "Learn Lab",
+  "image": "mcr.microsoft.com/devcontainers/dotnet:10.0",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": { "version": "22" }
+  },
+  "postCreateCommand": "cd extension && npm ci && npm run build && npm run package",
+  "postAttachCommand": "code --install-extension extension/learn-lab-0.1.0.vsix --force",
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-dotnettools.csdevkit"]
+    }
+  }
+}

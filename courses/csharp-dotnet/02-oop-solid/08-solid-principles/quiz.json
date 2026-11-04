@@ -4,7 +4,12 @@
     {
       "type": "mcq",
       "question": "A `UserManager` class validates user data, saves users to a file, AND sends welcome emails. Which principle does this violate?",
-      "options": ["Open/Closed", "Single Responsibility", "Liskov Substitution", "Dependency Inversion"],
+      "options": [
+        "Open/Closed",
+        "Single Responsibility",
+        "Liskov Substitution",
+        "Dependency Inversion"
+      ],
       "answer": 1,
       "explanation": "Three unrelated responsibilities (validation, persistence, email) bundled into one class means three unrelated reasons for it to change — a textbook SRP violation. Split it into three focused classes."
     },
@@ -13,9 +18,9 @@
       "question": "Which change best demonstrates the Open/Closed Principle?",
       "options": [
         "Adding an `if (shape is Triangle)` branch to an existing Area() method",
-        "Adding a new `Triangle : Shape` class with its own `override Area()`, without touching any existing code",
+        "Adding a `Triangle : Shape` class, changing no existing code",
         "Deleting the Shape base class and starting over",
-        "Making Area() private"
+        "Making Area() private so nothing outside can change it"
       ],
       "answer": 1,
       "explanation": "OCP means extending behavior by ADDING new code (a new subclass), not modifying working, already-tested code with more branches. Polymorphism is what makes this possible."
@@ -24,10 +29,10 @@
       "type": "mcq",
       "question": "Why does `Square : Rectangle` (where setting Width also silently changes Height) violate LSP?",
       "options": [
-        "Squares aren't real shapes",
-        "Code written correctly against Rectangle's documented behavior breaks when handed a Square instead, because Square secretly changes what setting Width means",
-        "Square should inherit from Circle instead",
-        "It doesn't violate anything, this is fine"
+        "Squares aren't real shapes, so they can't inherit",
+        "Code written for Rectangle breaks when given a Square",
+        "Square should inherit from Circle instead of Rectangle",
+        "It doesn't violate anything, squares are rectangles"
       ],
       "answer": 1,
       "explanation": "LSP requires that any subclass can be substituted for its base type without surprising behavior. A Square silently coupling Width and Height breaks reasonable expectations set by Rectangle, so substituting one for the other produces wrong results."
@@ -35,7 +40,12 @@
     {
       "type": "mcq",
       "question": "A `RobotWorker` is forced to implement `Eat()` from a fat `IWorker` interface, even though robots don't eat, and just throws `NotImplementedException`. Which principle fixes this?",
-      "options": ["Single Responsibility", "Interface Segregation — split IWorker into smaller, focused interfaces like IWorkable and IFeedable", "Liskov Substitution", "Open/Closed"],
+      "options": [
+        "Single Responsibility, since robots only work",
+        "Interface Segregation: split `IWorker`",
+        "Liskov Substitution, since robots replace workers",
+        "Open/Closed, since `IWorker` can't be extended"
+      ],
       "answer": 1,
       "explanation": "ISP says don't force implementers to provide methods they don't need. Splitting the fat interface into focused ones lets RobotWorker implement only IWorkable, with no irrelevant stub methods."
     },
@@ -44,10 +54,10 @@
       "question": "What does this refactor demonstrate?",
       "code": "// before\npublic class OrderProcessor { private EmailSender _s = new EmailSender(); }\n// after\npublic class OrderProcessor { public OrderProcessor(INotifier n) { _notifier = n; } }",
       "options": [
-        "Single Responsibility Principle",
-        "Dependency Inversion — depending on an interface (INotifier) instead of a concrete class, injected via constructor",
-        "Interface Segregation",
-        "This is not a SOLID-related change"
+        "Single Responsibility, by splitting up the class",
+        "Dependency Inversion, using an injected interface",
+        "Interface Segregation, with a smaller interface",
+        "This is not a SOLID-related change at all"
       ],
       "answer": 1,
       "explanation": "This is DIP in action: OrderProcessor no longer creates its own concrete EmailSender; it depends on an abstraction (INotifier) that's handed to it from outside — constructor (dependency) injection."

@@ -6,7 +6,7 @@
       "question": "What is the 'cache-aside' pattern?",
       "options": [
         "Always read from the database, never the cache",
-        "Check the cache first; on a miss, do the expensive work, store the result in the cache, then return it",
+        "Check the cache; on a miss, load and store it",
         "Cache everything permanently, forever",
         "A pattern only usable with databases, never with computed values"
       ],
@@ -17,8 +17,8 @@
       "type": "mcq",
       "question": "What does `_cache.Set(\"all_products\", products, TimeSpan.FromMinutes(10))` mean?",
       "options": [
-        "The products are permanently cached",
-        "The cached value is automatically evicted after 10 minutes, after which the next request becomes a cache miss again",
+        "The products are permanently cached until restart",
+        "The entry is evicted after 10 minutes",
         "The database is queried every 10 minutes automatically",
         "It caches for exactly 10 requests, not a time duration"
       ],
@@ -29,10 +29,10 @@
       "type": "mcq",
       "question": "A CreateProduct method adds a new product to the database but doesn't touch the cache. What's the bug?",
       "options": [
-        "There is no bug",
-        "The cached 'all_products' list is now stale — it won't include the new product until its expiration naturally passes",
+        "There is no bug, the cache updates itself",
+        "The cached list is stale until it expires",
         "The new product won't actually save to the database",
-        "This causes a runtime exception"
+        "This causes a runtime exception on the next read"
       ],
       "answer": 1,
       "explanation": "The cache has no way to know the underlying data changed. Without explicitly calling _cache.Remove(\"all_products\") (or otherwise updating the entry), callers will see the stale cached list until it expires on its own."
@@ -42,7 +42,7 @@
       "question": "Which scenario is a BAD candidate for caching?",
       "options": [
         "A rarely-changing list of countries",
-        "A user's current bank account balance, checked right before allowing a withdrawal",
+        "A bank balance checked before a withdrawal",
         "A product catalog that updates a few times a day",
         "A computed report that's expensive to generate and rarely changes"
       ],
@@ -53,8 +53,8 @@
       "type": "mcq",
       "question": "What does `GetOrCreateAsync` combine into one call?",
       "options": [
-        "Nothing, it's identical to Set",
-        "The check-cache-then-populate-on-miss flow — check the cache, and only run the provided lambda (and cache its result) if there was a miss",
+        "Nothing, it's identical to `Set`",
+        "Checking the cache and populating it on a miss",
         "Deleting and recreating the entire cache",
         "It only works for database calls, not any other computation"
       ],

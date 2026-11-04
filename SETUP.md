@@ -1,53 +1,71 @@
-# Setup — running this after cloning/forking
+# Setup
 
-The repo only tracks source (course content + extension `src/`). Build artifacts, dependencies, and the packaged extension are gitignored on purpose, so you need to build them once after cloning.
+There are two ways to run this course. Use your own copy of the repo if you want to keep your answers: click **Fork** on GitHub, then use your fork below.
 
-## Prerequisites
+## In the browser (nothing to install)
 
-| Tool | Check you have it | Get it |
+1. On the repo page, click **Code → Codespaces → Create codespace on main**.
+2. Wait a few minutes for the first build.
+3. Click the graduation-cap icon in the left bar. If it isn't there yet, run **Developer: Reload Window** from the Command Palette (`Ctrl+Shift+P`).
+
+Codespaces has a free monthly allowance on personal GitHub accounts. Stop the codespace when you finish a session so that it doesn't use up your hours.
+
+## On your computer
+
+You need:
+
+| Tool | Check with | Get it |
 |---|---|---|
-| **.NET SDK 10** | `dotnet --version` → `10.x` | https://dotnet.microsoft.com/download |
-| **Node.js** (18+) | `node --version` | https://nodejs.org |
-| **VS Code** | — | https://code.visualstudio.com |
-| **C# Dev Kit** extension (recommended, not required) | — | install from the VS Code Marketplace |
+| **.NET 10 SDK** | `dotnet --version` shows `10.x` | https://dotnet.microsoft.com/download/dotnet/10.0 |
+| **Node.js 18+** | `node --version` | https://nodejs.org |
+| **VS Code** | `code --version` | https://code.visualstudio.com |
 
-An internet connection is needed the *first* time you check a `test`-mode exercise (NuGet restores xUnit / EF Core / ASP.NET Core testing packages) — after that they're cached locally (`~/.nuget/packages`) and work offline.
+Then clone the repo and run the setup script from its folder.
 
-## Build and install the extension
+**Windows:**
 
 ```powershell
 git clone https://github.com/Sulaiman-Al-kadi/Learn.git
-cd Learn/extension
-npm run setup
+cd Learn
+powershell -ExecutionPolicy Bypass -File setup.ps1
 ```
 
-That one command does everything: `npm install` (dependencies), `npm run build` (bundles `src/` → `dist/extension.js`), `npm run package` (produces `learn-lab-0.1.0.vsix`), then installs it into VS Code (`code --install-extension ... --force`).
+**macOS or Linux:**
 
-Then in VS Code: `Ctrl+Shift+P` → **Developer: Reload Window**.
-
-*(Prefer the manual steps? `npm install && npm run build && npm run package && npm run install-extension` — same thing, one command at a time.)*
-
-## Open the course
-
-```powershell
-code C:\path\to\Learn      # open the REPO ROOT, not the extension/ subfolder
+```bash
+git clone https://github.com/Sulaiman-Al-kadi/Learn.git
+cd Learn
+bash setup.sh
 ```
 
-Click the graduation-cap icon in the Activity Bar (left sidebar). If it's not there, reload the window again — the extension only activates once it detects a `course.json` file inside the open folder (`workspaceContains:**/course.json`).
+The script checks the tools, builds and installs the Learn Lab extension, and opens the folder in VS Code. Learn Lab then asks to start the first lesson. VS Code also offers to install C# Dev Kit, which gives you code completion and red underlines while you type.
 
-## Verify it actually works
+## Checking that it works
 
-Pick any exercise in the sidebar → **Exercise** → press the beaker icon (🧪) or `Ctrl+Alt+Enter`. You should see a pass/fail result in a few seconds (longer — up to ~10s — the very first time, while NuGet restores).
+Open the first exercise and press **Check my code**. An unsolved exercise shows a failure message within a few seconds, and that means the checker is working.
 
-## After changing extension source (`extension/src/*.ts`)
+The first check of a unit-test exercise needs the internet, because NuGet downloads the test packages. After that they are cached and work offline.
 
-Re-run `npm run setup` (from `extension/`), then reload the window again — VS Code doesn't hot-reload a packaged extension.
+## Keeping your work
 
-## Common issues
+- Your answers are normal files in the exercise folders. Commit them to your fork to keep them.
+- Your progress is in `.learn/progress.json`, which git ignores. Copy that file if you move to another computer.
+- Before pulling course updates, commit your answers. If a pull conflicts with an exercise you edited, keep your version.
 
-| Symptom | Fix |
+## Getting help from a tutor
+
+Open [Claude Code](https://claude.com/claude-code) in this folder and ask about a lesson or an exercise, in any language. `CLAUDE.md` tells it to act as a tutor: it reads your exercise and your last Check result, and gives hints instead of solutions unless you ask for the answer.
+
+## Common problems
+
+| Problem | Fix |
 |---|---|
-| No graduation-cap icon | `Developer: Reload Window`; confirm you opened the repo root, not a subfolder |
-| `dotnet: command not found` | Install the .NET 10 SDK, restart your terminal/VS Code |
-| First exercise check takes forever / times out | Just NuGet restoring — check your internet connection, then retry |
-| Extension doesn't reflect a source change | You edited `.ts` but didn't rebuild/repackage/reinstall — see above |
+| No graduation-cap icon | Run **Developer: Reload Window**, and make sure you opened the repo folder itself, not `extension/` |
+| The script says `code` is missing | In VS Code, run **Shell Command: Install 'code' command in PATH**. On Windows, reinstall with **Add to PATH** ticked |
+| The script says a tool is missing right after installing it | Open a new terminal so that it sees the updated PATH |
+| "Could not download the NuGet packages" | Check your internet connection and try again |
+| Lots of red underlines in an exercise | Wait a minute after opening the folder while C# Dev Kit loads the projects |
+
+## Changing the extension
+
+After editing `extension/src/*.ts`, run `npm run setup` in `extension/`, then reload the VS Code window. VS Code doesn't hot-reload a packaged extension.

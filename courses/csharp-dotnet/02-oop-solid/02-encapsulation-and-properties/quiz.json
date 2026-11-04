@@ -5,10 +5,10 @@
       "type": "mcq",
       "question": "What's the main problem with `public double Balance;` as a plain field?",
       "options": [
-        "Fields are slower than properties",
-        "Nothing stops external code from setting it to an invalid value like -1000",
-        "Fields can't be read from outside the class",
-        "Fields require a constructor"
+        "Fields are slower than properties in every case",
+        "Any code can set it to an invalid value",
+        "Fields can't be read from outside their class",
+        "Fields require a constructor to get a value"
       ],
       "answer": 1,
       "explanation": "A public field has no way to run validation logic — any code can assign anything to it directly. Properties let you run code (like a range check) whenever the value is read or written."
@@ -29,7 +29,12 @@
       "type": "mcq",
       "question": "What prints?",
       "code": "public class Rect\n{\n    public double W { get; set; }\n    public double H { get; set; }\n    public double Area => W * H;\n}\n\nvar r = new Rect { W = 3, H = 4 };\nConsole.WriteLine(r.Area);\nr.W = 10;\nConsole.WriteLine(r.Area);",
-      "options": ["12 / 12", "12 / 40", "0 / 0", "It does not compile"],
+      "options": [
+        "12 / 12",
+        "12 / 40",
+        "0 / 0",
+        "It does not compile"
+      ],
       "answer": 1,
       "explanation": "`Area` is a COMPUTED property — it recalculates `W * H` every time it's read, never stores a stale value. First read: 3×4=12. After W changes to 10: 10×4=40."
     },
@@ -37,10 +42,10 @@
       "type": "mcq",
       "question": "What's the difference between `{ get; set; }` and `{ get; init; }`?",
       "options": [
-        "No difference, they're aliases",
-        "`init` can only be assigned during object construction (including an object initializer); `set` can be assigned any time",
+        "No difference, they're two names for the same thing",
+        "`init` only allows assignment during construction",
         "`init` is for value types, `set` is for reference types",
-        "`init` makes the property read-only forever, including during construction"
+        "`init` is read-only forever, even during construction"
       ],
       "answer": 1,
       "explanation": "`init` allows assignment only during construction (e.g. `new Order { Id = \"1\" }`), then locks. `set` allows assignment at any point in the object's lifetime."
@@ -60,7 +65,12 @@
     {
       "type": "mcq",
       "question": "Which access modifier allows access from the SAME class only, not even from classes that inherit from it?",
-      "options": ["`public`", "`protected`", "`private`", "`internal`"],
+      "options": [
+        "`public`",
+        "`protected`",
+        "`private`",
+        "`internal`"
+      ],
       "answer": 2,
       "explanation": "`private` is the tightest — only code written inside that exact class. `protected` extends access to derived classes too (next lesson)."
     },

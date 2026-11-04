@@ -1,3 +1,4 @@
+import { execFile } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
@@ -6,6 +7,7 @@ import { ProgressStore } from './progress';
 import { CourseTree, Node } from './tree';
 import { getRunner, copyDir, CheckResult } from './runners';
 import { QuizPanel, HintsPanel, parseHints } from './panels';
+import { LessonPanel } from './lessonView';
 
 let courses: Course[] = [];
 let progress: ProgressStore;
@@ -14,6 +16,9 @@ let treeView: vscode.TreeView<Node>;
 let output: vscode.OutputChannel;
 let statusBar: vscode.StatusBarItem;
 let currentExercise: ExerciseItem | undefined;
+let currentItem: Item | undefined;
+let checking = false;
+let workspaceRoot = '';
 
 // Virtual documents for the "expected vs actual" diff in output-mode exercises
 const diffDocs = new Map<string, string>();
@@ -22,13 +27,14 @@ const DIFF_SCHEME = 'learnlab';
 export function activate(context: vscode.ExtensionContext) {
   const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
   if (!root) return;
+  workspaceRoot = root;
 
   const coursesRoot = path.join(root, 'courses');
   output = vscode.window.createOutputChannel('Learn Lab');
   progress = new ProgressStore(path.join(root, '.learn', 'progress.json'));
   reload(coursesRoot);
 
-  tree = new CourseTree(() => courses, progress);
+  tree = new CourseTree(() => courses, progress, upNext);
   treeView = vscode.window.createTreeView('learnLab.courseTree', { treeDataProvider: tree, showCollapseAll: true });
 
   statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 50);
@@ -53,6 +59,8 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('learnLab.refresh', () => refresh(coursesRoot)),
     vscode.commands.registerCommand('learnLab.open', openItem),
     vscode.commands.registerCommand('learnLab.next', goNext),
+    vscode.commands.registerCommand('learnLab.continue', goContinue),
+    vscode.commands.registerCommand('learnLab.review', () => QuizPanel.showReview(courses, progress)),
     vscode.commands.registerCommand('learnLab.check', (node?: Node | ExerciseItem) => checkExercise(pick(node), dotnetPath)),
     vscode.commands.registerCommand('learnLab.hint', (node?: Node | ExerciseItem) => showHint(pick(node))),
     vscode.commands.registerCommand('learnLab.reset', (node?: Node | ExerciseItem) => resetExercise(pick(node))),
@@ -69,12 +77,32 @@ export function activate(context: vscode.ExtensionContext) {
     // Land the learner on the first unfinished item
     const first = allItems(courses).find(i => progress.status(i.id) !== 'done');
     if (first?.type === 'exercise') setCurrent(first);
+    checkDotnet(dotnetPath());
+    welcome(context);
   }
 }
 
 export function deactivate() {}
 
 // ---------- helpers ----------
+
+function checkDotnet(dotnet: string) {
+  execFile(dotnet, ['--version'], async (err, stdout) => {
+    if (!err && parseInt(stdout) >= 10) return;
+    const problem = err ? 'it was not found on this computer' : `this computer has ${stdout.trim()}`;
+    const pick = await vscode.window.showWarningMessage(`Learn Lab checks your code with the .NET 10 SDK, but ${problem}.`, 'Download .NET');
+    if (pick) vscode.env.openExternal(vscode.Uri.parse('https://dotnet.microsoft.com/download/dotnet/10.0'));
+  });
+}
+
+async function welcome(context: vscode.ExtensionContext) {
+  const untouched = allItems(courses).every(i => progress.status(i.id) === 'todo');
+  if (!untouched || context.workspaceState.get('learnLab.welcomed')) return;
+  context.workspaceState.update('learnLab.welcomed', true);
+  vscode.commands.executeCommand('learnLab.courseTree.focus');
+  const pick = await vscode.window.showInformationMessage('Welcome to Learn Lab. Lessons, quizzes, and exercises that check themselves are all in this panel.', 'Start the first lesson');
+  if (pick) goContinue();
+}
 
 function reload(coursesRoot: string) {
   try { courses = loadCourses(coursesRoot); }
@@ -90,6 +118,7 @@ function pick(node?: Node | ExerciseItem): ExerciseItem | undefined {
 
 function setCurrent(ex: ExerciseItem) {
   currentExercise = ex;
+  currentItem = ex;
   vscode.commands.executeCommand('setContext', 'learnLab.hasCurrentExercise', true);
   updateStatusBar();
 }
@@ -101,40 +130,69 @@ function updateStatusBar() {
   statusBar.show();
 }
 
+// First unfinished item from `startAt`, wrapping past the end of the course.
+function firstUnfinished(startAt: number): Item | undefined {
+  const items = allItems(courses);
+  return [...items.slice(startAt), ...items.slice(0, startAt)].find(i => progress.status(i.id) !== 'done');
+}
+
+function upNext(): Item | undefined {
+  const last = allItems(courses).findIndex(i => i.id === progress.lastItem);
+  return firstUnfinished(Math.max(last, 0));
+}
+
+// What the lesson panel's button leads to, whether or not `item` itself is finished.
+function nextAfter(item: Item): Item | undefined {
+  const items = allItems(courses);
+  const at = items.findIndex(i => i.id === item.id);
+  return [...items.slice(at + 1), ...items.slice(0, at)].find(i => progress.status(i.id) !== 'done');
+}
+
 async function openItem(item: Item) {
+  currentItem = item;
+  progress.setLastItem(item.id);
+  const context = { progress, nextAfter };
   switch (item.type) {
-    case 'lesson': {
-      const uri = vscode.Uri.file(item.file);
-      await vscode.commands.executeCommand('markdown.showPreview', uri);
-      progress.update(item.id, { status: 'done' });   // reading it counts; the quiz is what tests you
+    case 'lesson':
+      if (progress.status(item.id) === 'todo') progress.update(item.id, { status: 'attempted' });
+      LessonPanel.show(item, context, vscode.ViewColumn.Active);
       break;
-    }
     case 'quiz':
       QuizPanel.show(item, progress);
       break;
     case 'exercise': {
       setCurrent(item);
-      const readme = path.join(item.dir, 'README.md');
-      const main = path.join(item.dir, item.studentFiles[0]);
-      if (fs.existsSync(readme)) await vscode.commands.executeCommand('markdown.showPreview', vscode.Uri.file(readme));
-      const doc = await vscode.workspace.openTextDocument(main);
-      await vscode.window.showTextDocument(doc, fs.existsSync(readme) ? vscode.ViewColumn.Beside : vscode.ViewColumn.Active);
+      const hasReadme = fs.existsSync(path.join(item.dir, 'README.md'));
+      if (hasReadme) LessonPanel.show(item, context, vscode.ViewColumn.One);
+      const doc = await vscode.workspace.openTextDocument(path.join(item.dir, item.studentFiles[0]));
+      await vscode.window.showTextDocument(doc, hasReadme ? vscode.ViewColumn.Two : vscode.ViewColumn.Active);
       break;
     }
   }
 }
 
-async function goNext() {
-  const items = allItems(courses);
-  const startAt = currentExercise ? items.findIndex(i => i.id === currentExercise!.id) + 1 : 0;
-  const next = [...items.slice(startAt), ...items.slice(0, startAt)].find(i => progress.status(i.id) !== 'done');
+async function open(next: Item | undefined) {
   if (!next) { vscode.window.showInformationMessage('Everything is done. Add more content in courses/ or reset progress.'); return; }
   await openItem(next);
   try { await treeView.reveal({ kind: 'item', item: next } as Node, { select: true, expand: true }); } catch { /* reveal needs getParent; optional */ }
 }
 
+function goNext() {
+  const items = allItems(courses);
+  const at = currentItem ? items.findIndex(i => i.id === currentItem!.id) + 1 : 0;
+  return open(firstUnfinished(at));
+}
+
+function goContinue() { return open(upNext()); }
+
 async function checkExercise(ex: ExerciseItem | undefined, dotnetPath: () => string) {
   if (!ex) { vscode.window.showInformationMessage('Open an exercise first (click one in the Learn Lab sidebar).'); return; }
+  if (checking) { vscode.window.showInformationMessage('A check is already running.'); return; }
+  checking = true;
+  try { await runCheck(ex, dotnetPath); } finally { checking = false; }
+}
+
+async function runCheck(ex: ExerciseItem, dotnetPath: () => string) {
   await vscode.workspace.saveAll(false);
   output.clear();
   output.appendLine(`▶ Checking ${ex.lesson.title} / ${ex.title}  (${ex.check === 'output' ? 'compare output' : 'unit tests'})`);
@@ -148,6 +206,8 @@ async function checkExercise(ex: ExerciseItem | undefined, dotnetPath: () => str
   output.appendLine(result.details);
   output.appendLine('');
   output.appendLine(result.passed ? `✔ PASSED — ${result.summary}` : `✘ FAILED — ${result.summary}`);
+  if (result.cancelled) return;
+  saveLastCheck(ex, result);
 
   const prev = progress.get(ex.id);
   progress.update(ex.id, { attempts: (prev?.attempts ?? 0) + 1, status: result.passed ? 'done' : 'attempted' });
@@ -159,6 +219,14 @@ async function checkExercise(ex: ExerciseItem | undefined, dotnetPath: () => str
   } else {
     await showFailure(ex, result);
   }
+}
+
+// Lets a tutor in the editor (see CLAUDE.md) read what just happened.
+function saveLastCheck(ex: ExerciseItem, result: CheckResult) {
+  const body = ['# Last check', '', `Exercise: ${path.relative(workspaceRoot, ex.dir)}`, `Student files: ${ex.studentFiles.join(', ')}`, `Result: ${result.passed ? 'PASSED' : 'FAILED'}`, `Summary: ${result.summary}`, '', '~~~', result.details.slice(-6000), '~~~', ''];
+  const file = path.join(workspaceRoot, '.learn', 'last-check.md');
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, body.join('\n'));
 }
 
 async function showFailure(ex: ExerciseItem, result: CheckResult) {
@@ -178,7 +246,7 @@ async function showFailure(ex: ExerciseItem, result: CheckResult) {
 }
 
 function showHint(ex: ExerciseItem | undefined) {
-  if (!ex) return;
+  if (!ex) { vscode.window.showInformationMessage('Open an exercise first (click one in the Learn Lab sidebar).'); return; }
   if (!ex.hintsFile) { vscode.window.showInformationMessage('This exercise has no hints.'); return; }
   const hints = parseHints(ex.hintsFile);
   const used = progress.get(ex.id)?.hintsUsed ?? 0;

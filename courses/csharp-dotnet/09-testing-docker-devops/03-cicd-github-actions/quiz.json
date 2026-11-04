@@ -5,9 +5,9 @@
       "type": "mcq",
       "question": "What's the difference between Continuous Integration and Continuous Deployment/Delivery?",
       "options": [
-        "They're the same thing",
-        "CI automatically builds and tests every push; CD automatically packages/ships the result if CI passes",
-        "CD runs before CI",
+        "They're the same thing under different names",
+        "CI builds and tests; CD ships the result",
+        "CD runs before CI, on the developer's machine",
         "CI only applies to Docker, CD only applies to .NET"
       ],
       "answer": 1,
@@ -18,7 +18,7 @@
       "question": "What does `needs: build-and-test` on the image-push job accomplish?",
       "options": [
         "Nothing, it's optional decoration",
-        "The push job only runs if the build-and-test job succeeded — preventing a broken build from being packaged and pushed",
+        "The push runs only if build-and-test passed",
         "It makes the jobs run in parallel",
         "It duplicates the build-and-test job"
       ],
@@ -30,7 +30,7 @@
       "question": "Where should Docker Hub credentials used by a GitHub Actions workflow be stored?",
       "options": [
         "Hardcoded directly in the workflow YAML file",
-        "As GitHub repository secrets, referenced via ${{ secrets.NAME }} — never committed to source",
+        "As GitHub repository secrets",
         "In a comment in the Dockerfile",
         "In an environment variable set on the developer's own laptop"
       ],
@@ -41,10 +41,10 @@
       "type": "mcq",
       "question": "What happens on GitHub when `dotnet test` fails inside a workflow run?",
       "options": [
-        "Nothing is recorded",
-        "The job (and the overall run) is marked failed, visible on the PR — and can block merging if a branch protection rule requires the check to pass",
+        "Nothing is recorded on the pull request",
+        "The run fails, and that can block merging",
         "The workflow automatically fixes the failing test",
-        "GitHub deletes the failing commit"
+        "GitHub deletes the failing commit from the branch"
       ],
       "answer": 1,
       "explanation": "A failed step fails the job, which fails the run — visible as a red X on the PR/commit. Combined with a branch protection rule, this can literally prevent merging code with failing tests."

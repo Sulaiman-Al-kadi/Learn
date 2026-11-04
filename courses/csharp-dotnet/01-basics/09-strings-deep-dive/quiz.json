@@ -5,14 +5,24 @@
       "type": "mcq",
       "question": "What prints?",
       "code": "string s = \"hello\";\ns.ToUpper();\nConsole.WriteLine(s);",
-      "options": ["HELLO", "hello", "Hello", "It does not compile"],
+      "options": [
+        "HELLO",
+        "hello",
+        "Hello",
+        "It does not compile"
+      ],
       "answer": 1,
       "explanation": "Strings are immutable. `s.ToUpper()` returns a new string, but it's discarded since it's never assigned to anything. `s` itself never changes. Needed: `s = s.ToUpper();`."
     },
     {
       "type": "mcq",
       "question": "What does `\"Hello, World!\".Substring(7, 5)` return?",
-      "options": ["\"World!\"", "\"World\"", "\" World\"", "\"orld!\""],
+      "options": [
+        "\"World!\"",
+        "\"World\"",
+        "\" World\"",
+        "\"orld!\""
+      ],
       "answer": 1,
       "explanation": "Index 7 is 'W'. The second argument is a COUNT of characters, not an end index — take 5 characters starting there: 'World'."
     },
@@ -20,7 +30,12 @@
       "type": "mcq",
       "question": "What prints?",
       "code": "string csv = \"a,b,,c\";\nstring[] parts = csv.Split(',');\nConsole.WriteLine(parts.Length);",
-      "options": ["3", "4", "2", "It does not compile"],
+      "options": [
+        "3",
+        "4",
+        "2",
+        "It does not compile"
+      ],
       "answer": 1,
       "explanation": "Split on every comma, including the one that creates an empty piece between 'b' and 'c': [\"a\", \"b\", \"\", \"c\"] — 4 elements. Use `StringSplitOptions.RemoveEmptyEntries` to drop the empty one."
     },
@@ -40,7 +55,12 @@
       "type": "mcq",
       "question": "What does this print?",
       "code": "bool ok = int.TryParse(\"abc\", out int n);\nConsole.WriteLine(ok);\nConsole.WriteLine(n);",
-      "options": ["True / (some number)", "False / 0", "It crashes", "It does not compile"],
+      "options": [
+        "True / (some number)",
+        "False / 0",
+        "It crashes",
+        "It does not compile"
+      ],
       "answer": 1,
       "explanation": "TryParse never throws — it returns `false` when parsing fails, and sets the `out` parameter to the type's default (0 for int). This is why TryParse is safer than Parse for untrusted input."
     },
@@ -48,9 +68,9 @@
       "type": "mcq",
       "question": "Why use `StringBuilder` instead of `+=` inside a loop that runs thousands of times?",
       "options": [
-        "`+=` doesn't work inside loops",
-        "`StringBuilder` mutates in place; `+=` allocates a brand-new string every iteration, which is slow",
-        "They produce different results",
+        "`+=` doesn't work at all inside loops",
+        "`+=` allocates a new string every time",
+        "They produce different results for the same text",
         "`StringBuilder` is required by the compiler for loops"
       ],
       "answer": 1,

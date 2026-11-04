@@ -2,15 +2,15 @@
 
 This is the complete map of what `courses/csharp-dotnet` covers, start to finish: from your first `Console.WriteLine` to a deployed, tested, secured .NET backend. It mirrors the Islamic University of Madinah's 200-hour .NET Core training plan, expanded into 10 modules with hands-on, auto-checked exercises for nearly every concept.
 
-**Status:** all 10 modules are built — 33 lessons, ~117 checkable items (lessons + quizzes + exercises), all exercises verified (solution passes, starter fails).
+**Status:** all 10 modules are built — 42 lessons, 157 checkable items (lessons + quizzes + exercises), all exercises verified (solution passes, starter fails). Modules 3–8 have two extra practice exercises per lesson.
 
 ---
 
 ## Part I — The C# Language (Modules 1–4)
 
-### Module 1 — C# Basics (9 lessons)
-Printing & escape sequences · variables & the 5 core types (`int`, `double`, `string`, `bool`, `char`) · reading input & `TryParse`-style safety · operators & the integer-division trap · `if`/`else`/`else if` chains & the conditional operator · `while`/`do-while`/`for`/`foreach`, `break`/`continue` · methods, overloading, `params`, tuples, local functions · arrays vs. `List<T>`, reference semantics · string methods, `StringBuilder`, `int.TryParse`.
-**Capstone-equivalent exercises:** receipt printer, student card, order calculator, grade statistics, cinema pricing, number stats + multiplication table, helper method library, list toolkit, text tools library.
+### Module 1 — C# Basics (10 lessons)
+Printing & escape sequences · variables & the 5 core types (`int`, `double`, `string`, `bool`, `char`) · reading input & `TryParse`-style safety · operators & the integer-division trap · `if`/`else`/`else if` chains & the conditional operator · `while`/`do-while`/`for`/`foreach`, `break`/`continue` · methods, overloading, `params`, tuples, local functions · memory: value vs. reference types, stack & heap, `null`, immutability, the GC, `using` · arrays vs. `List<T>`, reference semantics · string methods, `StringBuilder`, `int.TryParse`.
+**Capstone-equivalent exercises:** receipt printer, student card, order calculator, grade statistics, cinema pricing, number stats + multiplication table, helper method library, aliases and copies, list toolkit, text tools library.
 
 ### Module 2 — OOP & SOLID (10 lessons)
 Classes & objects, constructors, `this` · encapsulation, properties (`get`/`set`/`init`), computed properties · inheritance, `virtual`/`override`, polymorphism, `base` · interfaces vs. abstract classes · records & value equality, `with` · generics, constraints, building a generic `Stack<T>` · exception handling, custom exceptions, guard clauses · **SOLID** (SRP, OCP, LSP, ISP, DIP) grounded in every prior lesson · writing unit tests with xUnit (`[Fact]`/`[Theory]`, AAA, `Assert.Throws`).
@@ -60,7 +60,7 @@ Your own project (booking system, attendance dashboard, or similar scope) built 
 
 | Plan week | Plan topic | Course module(s) |
 |---|---|---|
-| 1 | Environment, Git, C# syntax, memory/GC | Module 1 (memory/GC covered conceptually via value/reference semantics throughout; see also the earlier deleted W1 notes — reintroduce a dedicated memory lesson if you want the GC deep-dive back) |
+| 1 | Environment, Git, C# syntax, memory/GC | Module 1 (lesson 07b covers memory and the GC) |
 | 2 | OOP, SOLID, unit testing, ≥80% coverage | Module 2 |
 | 3 | Middleware, MVC vs Razor Pages, DI | Module 5 |
 | 4 | EF Core, migrations, relationships | Module 6 |
@@ -78,6 +78,6 @@ Your own project (booking system, attendance dashboard, or similar scope) built 
 - **Razor Pages / server-rendered MVC views** — mentioned in Module 5 for recognition, not built; this course stays API-focused per your stated goal.
 - **A real deployed cloud environment** (Azure/AWS) — Module 9's Docker/CI lessons prepare you for this, but actual cloud deployment needs an account and isn't part of the auto-checked content.
 - **SQL Server / PostgreSQL specifics** — Module 6 uses SQLite throughout (zero setup); the EF Core code you write is nearly identical for other providers, just a different `Use...()` call.
-- **Deep GC/memory internals** — the original from-scratch scaffold had a dedicated stack/heap/generational-GC lesson; it was removed in the pivot to Learn Lab. Ask if you want it rebuilt as a Module 1 addition.
+- **Deep GC internals** — Module 1 covers the working model of memory and the GC; generations, finalizers, and tuning are not covered.
 
 If you finish all 10 modules and want to go further, the natural next steps are: gRPC, SignalR (real-time), a message broker (RabbitMQ/Azure Service Bus) replacing Module 8's in-process `Channel<T>`, and a real cloud deployment.

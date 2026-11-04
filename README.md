@@ -2,15 +2,23 @@
 
 A personal learning system: lessons, quizzes, and exercises that are **checked automatically**.
 
-> **Cloned or forked this?** Build artifacts and dependencies aren't committed — see **[SETUP.md](SETUP.md)** for the one-time build/install steps before anything works.
+## Start here
+
+| | How | You need |
+|---|---|---|
+| **In the browser** | [Open in GitHub Codespaces](https://codespaces.new/Sulaiman-Al-kadi/Learn) | A GitHub account |
+| **On Windows** | Run `powershell -ExecutionPolicy Bypass -File setup.ps1` in the repo folder | .NET 10 SDK, Node.js, VS Code |
+| **On macOS or Linux** | Run `bash setup.sh` in the repo folder | .NET 10 SDK, Node.js, VS Code |
+
+The setup script checks those tools, tells you what is missing, installs the extension, and opens the course. [SETUP.md](SETUP.md) has the details and fixes for common problems.
 
 ## The curriculum
 
-**10 modules, 33 lessons, ~117 checkable items — from `Console.WriteLine` to a tested, secured, containerized .NET backend.** Full concept-by-concept map: **[ROADMAP.md](ROADMAP.md)**.
+**10 modules, 42 lessons, 157 checkable items — from `Console.WriteLine` to a tested, secured, containerized .NET backend.** Full concept-by-concept map: **[ROADMAP.md](ROADMAP.md)**.
 
 | Module | Topic |
 |---|---|
-| 1 | C# Basics — printing through strings, 9 lessons |
+| 1 | C# Basics — printing through strings, including how memory works, 10 lessons |
 | 2 | OOP & SOLID — classes through unit testing, capstone: Library System |
 | 3 | Collections & LINQ, capstone: Log Analyzer |
 | 4 | Async, Files, JSON & HTTP, capstone: WeatherClient |
@@ -22,9 +30,12 @@ A personal learning system: lessons, quizzes, and exercises that are **checked a
 | 10 | Your own capstone project |
 
 ## Open it
-1. `code C:\Learn` (or File → Open Folder → `C:\Learn`)
+1. Open the repo folder in VS Code (the setup script does this for you).
 2. Click the **graduation-cap icon** in the left Activity Bar → the **Learn Lab** panel shows the course tree.
-3. Click **Read the lesson** → read → click **Quiz** → answer → click **Exercise** → code → press **Check** (beaker icon or `Ctrl+Alt+Enter`).
+3. Click **Continue** at the top of the panel. It opens your next step: a lesson, a quiz, or an exercise. Every lesson ends with a button that leads to the next step, and exercises have **Check my code** (or `Ctrl+Alt+Enter`).
+4. Click **Review** now and then. It asks 5 questions from earlier lessons, and the ones you miss come back sooner.
+
+A quiz passes at 80%, and you can retry just the questions you missed.
 
 ## Sidebar buttons
 | Button | Does |
@@ -36,6 +47,10 @@ A personal learning system: lessons, quizzes, and exercises that are **checked a
 | right-click an exercise | **Reset** to starter code · **Show Solution** (diff against your code) |
 
 Progress is saved in `.learn/progress.json`. `Learn: Reset All Progress` clears it.
+
+## Asking for help
+
+Open Claude Code in this folder and ask in Arabic or English. `CLAUDE.md` tells it to act as a tutor: it reads your exercise and your last Check result (`.learn/last-check.md`), and gives hints instead of solutions unless you ask for the answer.
 
 ## Layout
 ```
@@ -52,6 +67,7 @@ courses/csharp-dotnet/          ← the course (add more courses or languages he
         input.txt               ← fed to your program as if typed
         hints.md                ← "## Hint 1", "## Hint 2", ...
         starter/ solution/      ← for Reset / Show Solution
+      exercise-2/, exercise-3/  ← extra practice, same layout
 extension/                      ← the VS Code extension source (TypeScript)
 ```
 
@@ -68,7 +84,7 @@ Some Module 9 lessons (Docker, CI/CD) are **guided labs** — `lesson.md` + `qui
 ## Adding content
 Drop a new folder following the layout above — no code changes needed. Exercise check modes:
 - **output** — `dotnet run Program.cs`, stdout compared to `expected.txt` (or every `cases/N.in` → `cases/N.out`).
-- **test** — `dotnet test` on the exercise's project; `Tests.cs` decides pass/fail. (Used from the "Methods" lesson onward, including every ASP.NET Core / EF Core exercise via `WebApplicationFactory`.)
+- **test** — `dotnet test` on the exercise's project; `Tests.cs` decides pass/fail. `"minTests": n` in `meta.json` sets the fewest tests that count, for exercises where the learner writes the tests. (Used from the "Methods" lesson onward, including every ASP.NET Core / EF Core exercise via `WebApplicationFactory`.)
 
 ## Rebuilding the extension (after changing `extension/src`)
 ```powershell

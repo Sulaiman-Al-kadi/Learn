@@ -5,7 +5,12 @@
       "type": "mcq",
       "question": "What prints?",
       "code": "public class Counter\n{\n    public int Value;\n}\n\nCounter a = new Counter();\nCounter b = new Counter();\na.Value = 5;\nConsole.WriteLine(b.Value);",
-      "options": ["5", "0", "null", "It does not compile"],
+      "options": [
+        "5",
+        "0",
+        "null",
+        "It does not compile"
+      ],
       "answer": 1,
       "explanation": "`a` and `b` are two separate objects, each with its own `Value` field. Changing `a.Value` has no effect on `b`. An `int` field defaults to `0` if never set."
     },
@@ -37,7 +42,12 @@
       "type": "mcq",
       "question": "What prints?",
       "code": "BankAccount acc = new BankAccount(100);\nbool result = acc.Withdraw(150);\nConsole.WriteLine(result);\nConsole.WriteLine(acc.Balance);",
-      "options": ["True / -50", "False / 100", "True / 100", "False / -50"],
+      "options": [
+        "True / -50",
+        "False / 100",
+        "True / 100",
+        "False / -50"
+      ],
       "answer": 1,
       "explanation": "Withdraw checks `amount > Balance` (150 > 100) and refuses, returning `false` without changing Balance. The account correctly stays at 100."
     },
@@ -51,10 +61,10 @@
       "type": "mcq",
       "question": "In `public Dog(string name) { this.Name = name; }`, what would happen if you wrote `Name = Name;` instead of `this.Name = name;`?",
       "options": [
-        "Same result — this.Name and Name are always interchangeable",
-        "The field Name would be set to itself (unchanged/default) — the parameter `name` would never be used",
-        "It would not compile",
-        "It would throw a runtime exception"
+        "Same result: `this.Name` and `Name` are always interchangeable",
+        "`Name` is assigned to itself, so `name` is never used",
+        "It would not compile, since a name can't be assigned to itself",
+        "It would throw a runtime exception when the object is created"
       ],
       "answer": 1,
       "explanation": "`Name` alone refers to the field (assuming no local shadowing), so `Name = Name;` just assigns the field to itself — the parameter `name` is silently ignored. This exact mistake is why `this.Name = name;` matters when field and parameter share a name (case-insensitively similar)."

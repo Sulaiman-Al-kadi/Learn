@@ -6,9 +6,9 @@
       "question": "What is a `DbSet<Student>` on your `DbContext`?",
       "options": [
         "A plain in-memory list, unrelated to the database",
-        "A representation of the Students TABLE — querying it with LINQ queries the table, adding to it stages an insert",
-        "A configuration setting",
-        "A single Student row"
+        "A representation of the Students table",
+        "A configuration setting for the connection string",
+        "A single Student row loaded from the table"
       ],
       "answer": 1,
       "explanation": "DbSet<T> is EF Core's bridge between your C# code and a database table — LINQ methods on it translate to SQL queries against that table."
@@ -18,8 +18,8 @@
       "question": "What actually happens when you call `context.Students.Add(student)` alone, without calling `SaveChangesAsync()`?",
       "options": [
         "The student is immediately inserted into the database",
-        "Nothing hits the database yet — the addition is only staged in memory until SaveChangesAsync runs",
-        "It throws an exception",
+        "Nothing yet: the addition is only staged in memory",
+        "It throws an exception because nothing was saved",
         "The student is inserted, but Id is not generated"
       ],
       "answer": 1,
@@ -30,10 +30,10 @@
       "question": "Why does this update the database, even though there's no explicit 'update' call?",
       "code": "var student = await context.Students.FindAsync(1);\nstudent.Grade = 95;\nawait context.SaveChangesAsync();",
       "options": [
-        "It doesn't — this code does nothing",
-        "EF Core's change tracking noticed the property changed on a tracked entity, and SaveChangesAsync generates the appropriate UPDATE",
-        "FindAsync automatically saves changes",
-        "You must call context.Update(student) explicitly for this to work"
+        "It doesn't, this code does nothing to the database",
+        "Change tracking noticed the edit on a tracked entity",
+        "`FindAsync` automatically saves any later changes",
+        "You must call `context.Update(student)` for this to work"
       ],
       "answer": 1,
       "explanation": "Once loaded via FindAsync, the entity is TRACKED. Any property change is noticed by EF Core's change tracker, and SaveChangesAsync compares tracked entities' current state to their original state, generating UPDATE statements for what changed."
@@ -42,10 +42,10 @@
       "type": "mcq",
       "question": "What's the purpose of a migration (`dotnet ef migrations add`)?",
       "options": [
-        "It runs your unit tests",
-        "It generates a versioned script describing how to change the real database schema to match your current entity classes",
-        "It deletes the database",
-        "It's an alternative to DbContext"
+        "It runs your unit tests against a new database",
+        "It scripts the schema change to match your entities",
+        "It deletes the database and creates it from scratch",
+        "It's an alternative to DbContext for reading data"
       ],
       "answer": 1,
       "explanation": "Migrations track schema changes over time, generated from comparing your entity classes to the previous migration state — letting the database evolve alongside your code with a repeatable, versioned history."
@@ -54,8 +54,8 @@
       "type": "mcq",
       "question": "Why use `ToListAsync()`/`FirstOrDefaultAsync()` instead of the synchronous `ToList()`/`FirstOrDefault()` you learned in Module 3, when querying a DbContext?",
       "options": [
-        "They behave completely differently",
-        "A database query is I/O — the async versions don't block the thread while waiting for the database to respond (Module 4, lesson 01)",
+        "They behave completely differently and return other data",
+        "A query is I/O, and async doesn't block the thread",
         "The synchronous versions don't exist for DbSet",
         "Async versions are only for writes, never reads"
       ],

@@ -27,6 +27,8 @@
       { "command": "learnLab.reset",        "title": "Learn: Reset Exercise",   "icon": "$(discard)" },
       { "command": "learnLab.solution",     "title": "Learn: Show Solution" },
       { "command": "learnLab.next",         "title": "Learn: Go To Next Item",  "icon": "$(arrow-right)" },
+      { "command": "learnLab.continue",     "title": "Learn: Continue Where I Left Off" },
+      { "command": "learnLab.review",       "title": "Learn: Review" },
       { "command": "learnLab.refresh",      "title": "Learn: Refresh",          "icon": "$(refresh)" },
       { "command": "learnLab.resetProgress","title": "Learn: Reset All Progress" }
     ],
@@ -35,7 +37,9 @@
         { "command": "learnLab.check",   "when": "view == learnLab.courseTree", "group": "navigation@1" },
         { "command": "learnLab.hint",    "when": "view == learnLab.courseTree", "group": "navigation@2" },
         { "command": "learnLab.next",    "when": "view == learnLab.courseTree", "group": "navigation@3" },
-        { "command": "learnLab.refresh", "when": "view == learnLab.courseTree", "group": "navigation@4" }
+        { "command": "learnLab.continue",     "title": "Learn: Continue Where I Left Off" },
+      { "command": "learnLab.review",       "title": "Learn: Review" },
+      { "command": "learnLab.refresh", "when": "view == learnLab.courseTree", "group": "navigation@4" }
       ],
       "view/item/context": [
         { "command": "learnLab.check",    "when": "view == learnLab.courseTree && viewItem == exercise", "group": "inline" },
@@ -70,6 +74,7 @@
     "typescript": "^5.6"
   },
   "dependencies": {
+    "highlight.js": "^11.12.0",
     "marked": "^15"
   }
 }

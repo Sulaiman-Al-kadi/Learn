@@ -6,9 +6,9 @@
       "question": "What does `app.MapOpenApi()` do?",
       "options": [
         "Renders an interactive Swagger UI page",
-        "Exposes a machine-readable JSON document describing your API's endpoints at /openapi/v1.json",
-        "Adds authentication to your API",
-        "Generates client code automatically"
+        "Serves a JSON description of your endpoints",
+        "Adds authentication to every endpoint in your API",
+        "Generates client code automatically for your API"
       ],
       "answer": 1,
       "explanation": "MapOpenApi() (paired with AddOpenApi()) generates and serves the raw OpenAPI JSON specification, built from inspecting your existing endpoint registrations. Swagger UI is a separate layer that renders this document nicely."
@@ -17,8 +17,8 @@
       "type": "mcq",
       "question": "What's the relationship between the OpenAPI document and Swagger UI?",
       "options": [
-        "They're the same thing",
-        "The OpenAPI document is the raw JSON description; Swagger UI is an interactive webpage that reads and renders that document for humans to browse and try",
+        "They're the same thing under two different names",
+        "Swagger UI is a webpage that renders the document",
         "Swagger UI generates the OpenAPI document",
         "You need Swagger UI even if you don't want the JSON document"
       ],
@@ -30,9 +30,9 @@
       "question": "Why is Swagger UI usually wrapped in `if (app.Environment.IsDevelopment())`?",
       "options": [
         "It only works during development for technical reasons",
-        "You typically don't want to expose an interactive 'try any endpoint' console on a real production server",
-        "It's required syntax",
-        "Production servers can't run Swagger UI"
+        "Production shouldn't expose a 'try any endpoint' console",
+        "It's required syntax around any Swagger call",
+        "Production servers can't run Swagger UI at all"
       ],
       "answer": 1,
       "explanation": "An interactive API console is a useful development tool but a potential security/exposure concern in production — most teams restrict it to non-production environments."
@@ -41,8 +41,8 @@
       "type": "mcq",
       "question": "What does adding `.WithSummary(\"...\")` and `.Produces<Student>(200)` to an endpoint registration change about how the endpoint behaves at runtime?",
       "options": [
-        "It adds validation logic",
-        "Nothing about runtime behavior — it only enriches the generated OpenAPI documentation with human-readable text and expected response shapes",
+        "It adds validation logic based on the declared type",
+        "Nothing at runtime; it only enriches the docs",
         "It changes the HTTP status code returned",
         "It makes the endpoint require authentication"
       ],

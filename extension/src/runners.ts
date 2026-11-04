@@ -1,4 +1,4 @@
-import { spawn } from 'child_process';
+import { spawn, spawnSync, ChildProcess } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
@@ -6,6 +6,7 @@ import { ExerciseItem } from './model';
 
 export interface CheckResult {
   passed: boolean;
+  cancelled?: boolean;
   summary: string;   // one line, shown in a notification
   details: string;   // full output, shown in the Output channel
   expected?: string; // output mode: for the diff view
@@ -18,18 +19,50 @@ export interface Runner {
 
 // ---------- process helper ----------
 
-interface ProcResult { code: number | null; stdout: string; stderr: string; timedOut: boolean; }
+const OUTPUT_LIMIT = 1_000_000;  // characters; a runaway print loop must not fill memory
+const RUN_TIMEOUT = 30_000;      // one output-mode run; normal runs take about a second
+const TEST_TIMEOUT = 180_000;    // includes restore and build
+const KILL_GRACE = 3_000;
 
-function run(cmd: string, args: string[], cwd: string, stdin: string | undefined, token: vscode.CancellationToken, timeoutMs = 120_000): Promise<ProcResult> {
+interface ProcResult { code: number | null; stdout: string; stderr: string; timedOut: boolean; cancelled: boolean; overflow: boolean; missing: boolean; }
+
+// `dotnet run` and `dotnet test` start child processes of their own, so the whole tree has to go.
+function killTree(child: ChildProcess) {
+  if (process.platform === 'win32' && child.pid) spawnSync('taskkill', ['/PID', String(child.pid), '/T', '/F'], { windowsHide: true });
+  else if (child.pid) process.kill(-child.pid, 'SIGKILL');
+}
+
+function run(cmd: string, args: string[], cwd: string, stdin: string | undefined, token: vscode.CancellationToken, timeoutMs = RUN_TIMEOUT): Promise<ProcResult> {
   return new Promise(resolve => {
-    const child = spawn(cmd, args, { cwd, shell: process.platform === 'win32', env: { ...process.env, DOTNET_CLI_UI_LANGUAGE: 'en', DOTNET_NOLOGO: '1' } });
-    let stdout = '', stderr = '', timedOut = false;
-    const timer = setTimeout(() => { timedOut = true; child.kill(); }, timeoutMs);
-    token.onCancellationRequested(() => child.kill());
-    child.stdout.on('data', d => (stdout += d));
-    child.stderr.on('data', d => (stderr += d));
-    child.on('close', code => { clearTimeout(timer); resolve({ code, stdout, stderr, timedOut }); });
-    child.on('error', err => { clearTimeout(timer); resolve({ code: -1, stdout, stderr: String(err), timedOut }); });
+    const child = spawn(cmd, args, { cwd, windowsHide: true, detached: process.platform !== 'win32', env: { ...process.env, DOTNET_CLI_UI_LANGUAGE: 'en', DOTNET_NOLOGO: '1' } });
+    let stdout = '', stderr = '', timedOut = false, cancelled = false, overflow = false, finished = false;
+    let graceTimer: NodeJS.Timeout | undefined;
+
+    const finish = (code: number | null, missing = false) => {
+      if (finished) return;
+      finished = true;
+      clearTimeout(timer);
+      clearTimeout(graceTimer);
+      sub.dispose();
+      resolve({ code, stdout, stderr, timedOut, cancelled, overflow, missing });
+    };
+    // Don't wait on `close` alone: a process that survives the kill keeps the pipes open and it would never fire.
+    const stop = () => {
+      killTree(child);
+      graceTimer = setTimeout(() => finish(null), KILL_GRACE);
+    };
+    const collect = (append: (s: string) => void) => (d: Buffer) => {
+      if (stdout.length + stderr.length < OUTPUT_LIMIT) { append(d.toString()); return; }
+      if (!overflow) { overflow = true; stop(); }
+    };
+
+    const timer = setTimeout(() => { timedOut = true; stop(); }, timeoutMs);
+    const sub = token.onCancellationRequested(() => { cancelled = true; stop(); });
+    child.stdout.on('data', collect(s => (stdout += s)));
+    child.stderr.on('data', collect(s => (stderr += s)));
+    child.on('close', code => finish(code));
+    child.on('error', err => { stderr += String(err); finish(-1, (err as NodeJS.ErrnoException).code === 'ENOENT'); });
+    child.stdin.on('error', () => { /* the program may exit before reading its input */ });
     if (stdin !== undefined) child.stdin.write(stdin);
     child.stdin.end();
   });
@@ -61,6 +94,25 @@ function loadCases(ex: ExerciseItem): Case[] {
   }];
 }
 
+const DOTNET_MISSING = 'The .NET SDK was not found. Install .NET 10 from https://dotnet.microsoft.com/download, then restart VS Code.';
+
+function stopped(r: ProcResult, seconds: number): Pick<CheckResult, 'summary' | 'cancelled'> | undefined {
+  if (r.cancelled) return { summary: 'Check cancelled.', cancelled: true };
+  if (r.overflow) return { summary: 'Stopped: your program printed far too much output. Look for a loop that never ends.' };
+  if (r.timedOut) return { summary: `Stopped after ${seconds}s. Look for a loop that never ends.` };
+  return undefined;
+}
+
+// Restore problems are not the learner's code, so they must not read like a code or test failure.
+function restoreError(out: string): string | undefined {
+  const line = out.split('\n').find(l => /error\s+NU\d+/.test(l));
+  if (!line) return undefined;
+  const code = line.match(/NU\d+/)?.[0];
+  return /NU13\d\d/.test(line) && code !== 'NU1302'
+    ? `Could not download the NuGet packages (${code}). Check your internet connection and try again.`
+    : `NuGet restore failed (${code}). Show output has the full message.`;
+}
+
 // ---------- .NET runner ----------
 
 export class DotnetRunner implements Runner {
@@ -84,12 +136,18 @@ export class DotnetRunner implements Runner {
       const label = cases.length > 1 ? `[case ${c.name}] ` : '';
       log.push(`── ${label}stdin: ${JSON.stringify(c.input)}`);
 
-      if (r.timedOut) return { passed: false, summary: `${label}Timed out after 120s (infinite loop? waiting for input?)`, details: log.concat(r.stdout, r.stderr).join('\n') };
+      if (r.missing) return { passed: false, summary: DOTNET_MISSING, details: r.stderr };
+      const stop = stopped(r, RUN_TIMEOUT / 1000);
+      if (stop) return { passed: false, ...stop, summary: label + stop.summary, details: log.concat(r.stdout.slice(-2000), r.stderr.slice(-2000)).join('\n') };
       if (r.code !== 0) {
-        const errs = (r.stdout + '\n' + r.stderr).split('\n').filter(l => /error|Unhandled exception/i.test(l));
+        const text = r.stdout + '\n' + r.stderr;
+        const errs = text.split('\n').filter(l => /error|Unhandled exception/i.test(l));
+        if (/error CS5001/.test(text)) return { passed: false, summary: `Nothing to run yet. Write your code in ${entry}, then check again.`, details: log.concat(r.stdout, r.stderr).join('\n') };
+        const where = text.match(/:line (\d+)/)?.[1];
+        const first = errs[0]?.replace(/^.*?\((\d+),(\d+)\):\s*/, 'Line $1: ').replace(/\s*\[.*\]$/, '').trim();
         return {
           passed: false,
-          summary: label + (errs[0]?.replace(/^.*?\((\d+),(\d+)\):\s*/, 'Line $1: ').replace(/\s*\[.*\]$/, '').trim() || `Program exited with code ${r.code}`),
+          summary: label + (first ? first + (where && !first.startsWith('Line') ? ` (line ${where})` : '') : `Program exited with code ${r.code}`),
           details: log.concat(r.stdout, r.stderr).join('\n'),
         };
       }
@@ -112,29 +170,45 @@ export class DotnetRunner implements Runner {
 
   // Mode 2: `dotnet test` on the exercise project; Tests.cs is the oracle
   private async checkTests(ex: ExerciseItem, token: vscode.CancellationToken): Promise<CheckResult> {
-    const r = await run(this.dotnet(), ['test', '--nologo', '-v', 'q'], ex.dir, undefined, token, 180_000);
+    // The normal console logger prints failing test names and Expected/Actual. It also replaces the compact
+    // "Failed: x, Passed: y" line with "Total tests: n" plus separate Passed/Failed lines, parsed below.
+    const r = await run(this.dotnet(), ['test', '--nologo', '-v', 'q', '--logger', 'console;verbosity=normal'], ex.dir, undefined, token, TEST_TIMEOUT);
     const out = r.stdout + '\n' + r.stderr;
 
-    if (r.timedOut) return { passed: false, summary: 'Timed out after 180s', details: out };
+    if (r.missing) return { passed: false, summary: DOTNET_MISSING, details: out };
+    const stop = stopped(r, TEST_TIMEOUT / 1000);
+    if (stop) return { passed: false, ...stop, details: out.slice(-4000) };
+
+    const restore = restoreError(out);
+    if (restore) return { passed: false, summary: restore, details: out };
 
     const buildErrors = out.split('\n').filter(l => /error CS\d+/.test(l));
     if (buildErrors.length) {
-      const first = buildErrors[0].replace(/^.*?\((\d+),(\d+)\):\s*error\s*(CS\d+):\s*/, 'Line $1 [$3]: ').replace(/\s*\[.*\]$/, '').trim();
+      const first = buildErrors[0].replace(/^.*?\((\d+),(\d+)\):\s*error\s*(CS\d+):\s*/, 'Line $1 [$3]: ').replace(/\s*\[.*\]\s*$/, '').trim();
       return { passed: false, summary: `Does not compile — ${first}`, details: out };
     }
 
-    const m = out.match(/Failed:\s*(\d+),\s*Passed:\s*(\d+),\s*Skipped:\s*(\d+),\s*Total:\s*(\d+)/);
-    if (!m) {
-      // A genuine all-pass run always prints the "Failed: X, Passed: Y, ..." summary line.
-      // No summary at all (e.g. zero [Fact]s discovered) must never read as a pass, regardless of exit code.
-      return { passed: false, summary: 'No tests were found — write at least one [Fact].', details: out };
+    const totalLine = out.match(/Total tests:\s*(\d+)/);
+    if (!totalLine) {
+      // A genuine run always prints "Total tests: n". No such line at all (e.g. zero [Fact]s discovered)
+      // must never read as a pass, regardless of exit code.
+      const other = out.split('\n').find(l => /\berror\b/i.test(l))?.trim();
+      return { passed: false, summary: other ? other.slice(0, 200) : 'No tests were found — write at least one [Fact].', details: out };
     }
-    const [, failed, passed, , total] = m.map(Number);
+    const total = Number(totalLine[1]);
+    const passed = Number(out.match(/^\s*Passed:\s*(\d+)/m)?.[1] ?? 0);
+    const failed = Number(out.match(/^\s*Failed:\s*(\d+)/m)?.[1] ?? 0);
     if (total === 0) return { passed: false, summary: 'No tests were found — write at least one [Fact].', details: out };
-    if (failed === 0) return { passed: true, summary: `All ${total} tests passed.`, details: out };
 
-    const failedNames = out.split('\n').filter(l => /^\s*Failed\s+\S+/.test(l)).map(l => l.trim().replace(/\s*\[.*$/, '').replace(/^Failed\s+/, '')).slice(0, 3);
-    return { passed: false, summary: `${passed}/${total} passed. Failing: ${failedNames.join(', ')}`, details: out };
+    if (failed === 0) {
+      if (ex.minTests && total < ex.minTests) return { passed: false, summary: `${total} test${total > 1 ? 's' : ''} found, but this exercise asks for at least ${ex.minTests}.`, details: out };
+      return { passed: true, summary: `All ${total} tests passed.`, details: out };
+    }
+
+    const failedNames = out.split('\n').filter(l => /^\s*Failed\s+.+\[[^\]]+\]\s*$/.test(l)).map(l => l.trim().replace(/\s*\[.*$/, '').replace(/^Failed\s+/, '').replace(/^.*\.(?=[^.(]+(\(|$))/, ''));
+    const shown = failedNames.slice(0, 3).join(', ') + (failedNames.length > 3 ? ` and ${failedNames.length - 3} more` : '');
+    const firstFailure = out.match(/Expected:[^\r\n]*\r?\n\s*Actual:[^\r\n]*/)?.[0].replace(/\s+/g, ' ').replace(/ Actual:/, ', Actual:');
+    return { passed: false, summary: `${passed}/${total} passed. Failing: ${shown}.${firstFailure ? ` First failure: ${firstFailure}` : ''}`, details: out };
   }
 }
 
@@ -151,6 +225,10 @@ export function copyDir(from: string, to: string) {
   fs.mkdirSync(to, { recursive: true });
   for (const e of fs.readdirSync(from, { withFileTypes: true })) {
     const src = path.join(from, e.name), dst = path.join(to, e.name);
-    if (e.isDirectory()) copyDir(src, dst); else fs.copyFileSync(src, dst);
+    if (e.isDirectory()) { copyDir(src, dst); continue; }
+    fs.copyFileSync(src, dst);
+    // Windows keeps the source's old timestamp, and an old timestamp makes `dotnet` reuse the previous build.
+    const now = new Date();
+    fs.utimesSync(dst, now, now);
   }
 }

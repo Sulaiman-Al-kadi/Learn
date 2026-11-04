@@ -5,7 +5,12 @@
       "type": "mcq",
       "question": "What prints?",
       "code": "try\n{\n    int[] arr = { 1, 2 };\n    Console.WriteLine(arr[5]);\n}\ncatch (IndexOutOfRangeException)\n{\n    Console.WriteLine(\"caught\");\n}\nConsole.WriteLine(\"after\");",
-      "options": ["caught\\nafter", "after", "The program crashes before printing anything", "caught"],
+      "options": [
+        "caught\\nafter",
+        "after",
+        "The program crashes before printing anything",
+        "caught"
+      ],
       "answer": 0,
       "explanation": "The exception is thrown inside try, caught by the matching catch (prints 'caught'), and execution continues normally afterward — 'after' prints too. The crash was contained."
     },
@@ -14,10 +19,10 @@
       "question": "What's wrong with this ordering?",
       "code": "try { ... }\ncatch (Exception ex) { Console.WriteLine(\"general\"); }\ncatch (FormatException ex) { Console.WriteLine(\"specific\"); }",
       "options": [
-        "Nothing, this is fine",
-        "The FormatException catch is unreachable — Exception already matches everything, including FormatException, and catches are checked top to bottom",
+        "Nothing, this is fine as written",
+        "The first catch leaves the second unreachable",
         "It doesn't compile for an unrelated reason",
-        "FormatException must come before try, not after"
+        "`FormatException` must come before `try`, not after it"
       ],
       "answer": 1,
       "explanation": "Since FormatException IS an Exception, the first (general) catch always matches first. The compiler flags the second catch block as unreachable code. Specific catches must come BEFORE general ones."
@@ -26,7 +31,12 @@
       "type": "mcq",
       "question": "What prints?",
       "code": "try\n{\n    Console.WriteLine(\"A\");\n    throw new InvalidOperationException();\n}\ncatch (InvalidOperationException)\n{\n    Console.WriteLine(\"B\");\n}\nfinally\n{\n    Console.WriteLine(\"C\");\n}",
-      "options": ["A\\nB\\nC", "A\\nC", "A\\nB", "C\\nA\\nB"],
+      "options": [
+        "A\\nB\\nC",
+        "A\\nC",
+        "A\\nB",
+        "C\\nA\\nB"
+      ],
       "answer": 0,
       "explanation": "try runs (prints A), throws, catch matches (prints B), and finally ALWAYS runs regardless (prints C) — in that order."
     },
@@ -35,7 +45,7 @@
       "question": "Which situation is the best fit for throwing an exception (rather than returning a bool/TryParse-style result)?",
       "options": [
         "Checking whether user-typed text is a valid number",
-        "Withdrawing more money than a bank account contains — a genuine business rule violation",
+        "Withdrawing more money than the account holds",
         "Checking if a list contains a value",
         "Looking up a dictionary key that might not exist"
       ],
@@ -48,8 +58,8 @@
       "code": "public class InsufficientFundsException : Exception\n{\n    public InsufficientFundsException(string message) : base(message) { }\n}",
       "options": [
         "Nothing, it's optional decoration",
-        "Passes the message up to Exception's own constructor, which is what makes ex.Message return it",
-        "Creates a new base exception object separately",
+        "Passes the message up to `Exception`",
+        "Creates a separate base exception object",
         "It's required syntax with no functional effect"
       ],
       "answer": 1,

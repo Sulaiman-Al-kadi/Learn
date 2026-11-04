@@ -69,7 +69,7 @@ scores.Add(88);
 Console.WriteLine(scores.Count);      // 3   ← Count, not Length!
 ```
 
-You can also use a collection expression, exactly like arrays:
+You can also list the starting values in square brackets. This is a **collection expression**, and it works for arrays too (`int[] a = [1, 2, 3];`):
 
 ```csharp
 List<string> names = ["Ali", "Sara", "Omar"];
@@ -132,7 +132,7 @@ int[] backToArray = list.ToArray(); // list → array
 
 ## A note on reference semantics
 
-Arrays and lists are **reference types** (from Module 1's memory notes) — assigning one to another variable copies the *reference*, not the contents:
+Arrays and lists are **reference types** (from the memory lesson you just finished) — assigning one to another variable copies the *reference*, not the contents:
 
 ```csharp
 int[] a = [1, 2, 3];

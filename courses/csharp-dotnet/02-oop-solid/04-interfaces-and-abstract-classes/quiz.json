@@ -4,7 +4,12 @@
     {
       "type": "mcq",
       "question": "What happens if `Duck` implements `IFlyable` but forgets to write a `Fly()` method?",
-      "options": ["Nothing — Fly() just does nothing at runtime", "A compile error — the contract is not fulfilled", "A runtime exception the first time Fly() is called", "IFlyable silently provides a default"],
+      "options": [
+        "Nothing — Fly() just does nothing at runtime",
+        "A compile error — the contract is not fulfilled",
+        "A runtime exception the first time Fly() is called",
+        "IFlyable silently provides a default"
+      ],
       "answer": 1,
       "explanation": "An interface is a compile-time contract. If a class claims `: IFlyable` but doesn't implement everything the interface requires, the code doesn't compile at all."
     },
@@ -24,7 +29,12 @@
       "type": "mcq",
       "question": "What's wrong with this?",
       "code": "public abstract class Shape\n{\n    public abstract double Area();\n}\n\nShape s = new Shape();",
-      "options": ["Nothing, this is fine", "Abstract classes cannot be instantiated directly with `new`", "Area() needs a body", "Shape needs a constructor"],
+      "options": [
+        "Nothing, this is fine",
+        "Abstract classes can't be created with `new`",
+        "`Area()` needs a body, since every method must have one",
+        "`Shape` needs a constructor before it can be used"
+      ],
       "answer": 1,
       "explanation": "`abstract` on a class means it can never be `new`'d directly — it exists only to be inherited from. Only a concrete (non-abstract) subclass that implements `Area()` can be instantiated."
     },
@@ -32,9 +42,9 @@
       "type": "mcq",
       "question": "Two completely unrelated classes, `Invoice` and `Employee`, both need to be processed in the same loop and summed by an `Amount`. What's the right tool?",
       "options": [
-        "Make Employee inherit from Invoice",
-        "Have both implement a shared interface, e.g. `IPayable`, with an `Amount` property",
-        "Use `object` and cast inside the loop",
+        "Make Employee inherit from Invoice, so both share one type",
+        "Have both implement a shared `IPayable` interface",
+        "Use `object` and cast to each type inside the loop",
         "Copy the summing logic into both classes separately"
       ],
       "answer": 1,
@@ -44,9 +54,9 @@
       "type": "mcq",
       "question": "In an abstract class, what's the difference between an `abstract` method and a `virtual` method?",
       "options": [
-        "No difference",
-        "`abstract` has no body and FORCES every concrete subclass to override it; `virtual` has a default body and overriding is optional",
-        "`virtual` cannot be overridden at all",
+        "No difference, the two keywords mean the same thing",
+        "`abstract` must be overridden; `virtual` may be",
+        "`virtual` methods cannot be overridden at all",
         "`abstract` methods can only exist in interfaces"
       ],
       "answer": 1,

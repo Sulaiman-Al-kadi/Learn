@@ -4,14 +4,24 @@
     {
       "type": "mcq",
       "question": "What makes a method actually run as a test by xUnit?",
-      "options": ["Naming it something ending in 'Test'", "The `[Fact]` attribute above it", "Putting it in a file called Tests.cs", "Making it static"],
+      "options": [
+        "Naming it something ending in 'Test'",
+        "The `[Fact]` attribute above it",
+        "Putting it in a file called Tests.cs",
+        "Making it static"
+      ],
       "answer": 1,
       "explanation": "xUnit discovers test methods by the `[Fact]` (or `[Theory]`) attribute, not by naming convention or file name alone. Without it, the method is never run automatically."
     },
     {
       "type": "mcq",
       "question": "In `Assert.Equal(expected, actual)`, which argument comes first?",
-      "options": ["actual, then expected", "expected, then actual", "Order doesn't matter", "It depends on the types"],
+      "options": [
+        "actual, then expected",
+        "expected, then actual",
+        "Order doesn't matter",
+        "It depends on the types"
+      ],
       "answer": 1,
       "explanation": "By convention (and how xUnit phrases failure messages), the EXPECTED value comes first, the ACTUAL (computed) value second: `Assert.Equal(5, Calculator.Add(2, 3));`."
     },
@@ -20,9 +30,9 @@
       "question": "Why does `Assert.Throws<T>` take a lambda `() => SomeMethod()` instead of just `SomeMethod()`?",
       "options": [
         "It's just a style preference, both work identically",
-        "If SomeMethod() were called directly, the exception would already be thrown before Assert.Throws could catch and verify it — the lambda delays the call",
-        "Lambdas run faster",
-        "Assert.Throws only accepts lambdas for unrelated syntax reasons"
+        "Otherwise the exception fires before the assert runs",
+        "Lambdas run faster than direct method calls",
+        "`Assert.Throws` only accepts lambdas for syntax reasons"
       ],
       "answer": 1,
       "explanation": "`Assert.Throws` needs to control WHEN the code runs so it can wrap it in its own try/catch internally. Passing `() => SomeMethod()` hands it a delayed, callable reference instead of the already-evaluated result."
@@ -31,10 +41,10 @@
       "type": "mcq",
       "question": "What's the benefit of `[Theory]` + `[InlineData]` over five separate `[Fact]` methods testing the same logic with different numbers?",
       "options": [
-        "Theory tests run faster",
-        "It avoids repeating nearly-identical test code five times — DRY applied to tests, and each InlineData row still reports its own pass/fail",
-        "Fact tests can't take parameters at all",
-        "There's no real difference"
+        "Theory tests run faster than separate Fact tests",
+        "One test method covers every case",
+        "Fact tests can't be grouped into a class together",
+        "There's no real difference between the two"
       ],
       "answer": 1,
       "explanation": "`[Theory]` runs the same test body once per `[InlineData]` row, avoiding copy-pasted near-duplicate Facts, while still reporting each case individually if one fails."
@@ -42,7 +52,12 @@
     {
       "type": "mcq",
       "question": "Testing `IsPrime`, which of these is the MOST important edge case people forget?",
-      "options": ["A large prime number like 97", "1 — which is NOT prime by definition, despite having no divisors other than itself", "Testing it twice with the same input", "Testing with a string instead of an int"],
+      "options": [
+        "A large prime number like 97",
+        "1, which is not prime by definition",
+        "Testing it twice with the same input",
+        "Testing with a string instead of an int"
+      ],
       "answer": 1,
       "explanation": "1 is a classic edge case: it's easy to assume 'no factors other than 1 and itself' applies, but by mathematical definition primes must be greater than 1. A correct IsPrime must explicitly handle this."
     },

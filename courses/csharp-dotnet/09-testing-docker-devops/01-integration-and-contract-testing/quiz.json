@@ -6,7 +6,7 @@
       "question": "Why does the testing pyramid have MANY unit tests at the bottom and FEW end-to-end tests at the top?",
       "options": [
         "Unit tests are more important than E2E tests",
-        "Unit tests are fast and cheap, catching most bugs efficiently; E2E tests are slow and expensive, reserved for what only shows up in the full real system",
+        "Unit tests are cheap; E2E tests are slow and costly",
         "E2E tests don't actually test anything useful",
         "It's an arbitrary convention with no real reasoning"
       ],
@@ -18,7 +18,7 @@
       "question": "Which of these is an INTEGRATION test, not a unit test?",
       "options": [
         "Testing a Library class with a fake ILateFeePolicy injected",
-        "Using WebApplicationFactory to send a real HTTP request through your app's actual routing, model binding, and database",
+        "A WebApplicationFactory request through the real app",
         "Testing a single method's return value with no dependencies at all",
         "Testing that a record's Equals works correctly"
       ],
@@ -29,9 +29,9 @@
       "type": "mcq",
       "question": "What does a contract test verify that a normal integration test testing `student.Name == \"Ali\"` does NOT?",
       "options": [
-        "Nothing different",
-        "That the response's SHAPE (required fields, JSON types) is correct — independent of which specific student or data values come back",
-        "That the database connection works",
+        "Nothing different from an integration test",
+        "The response's shape, whatever the data",
+        "That the database connection works on each call",
         "That the server is running on the correct port"
       ],
       "answer": 1,
@@ -41,10 +41,10 @@
       "type": "mcq",
       "question": "Why use `JsonDocument.Parse(...)` instead of `JsonSerializer.Deserialize<T>(...)` for a contract test?",
       "options": [
-        "JsonDocument is faster",
-        "Contract tests check STRUCTURE without assuming a specific target type already matches — JsonDocument gives a low-level, navigable view of any JSON, which is exactly what's needed to verify shape rather than deserialize into an assumed-correct type",
-        "Deserialize<T> doesn't work with JSON",
-        "There's no real difference"
+        "JsonDocument is faster, which matters in tests",
+        "It checks structure without assuming a type",
+        "`Deserialize<T>` doesn't work with JSON arrays",
+        "There's no real difference between them"
       ],
       "answer": 1,
       "explanation": "Deserialize<T> presupposes T already correctly describes the shape — if the actual response doesn't match T, you might get silent default values rather than a clear failure. JsonDocument lets you explicitly check field-by-field what's actually present."

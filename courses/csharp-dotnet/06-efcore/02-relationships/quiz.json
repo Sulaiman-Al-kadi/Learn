@@ -5,9 +5,9 @@
       "type": "mcq",
       "question": "In the Classroom/Student example, what is `ClassroomId` on `Student`?",
       "options": [
-        "A navigation property",
-        "The foreign key — the actual column linking a student row to its classroom row",
-        "An unused property",
+        "A navigation property for reaching the classroom",
+        "The foreign key column linking to the classroom",
+        "An unused property that EF Core ignores",
         "The same thing as the navigation property Classroom"
       ],
       "answer": 1,
@@ -17,7 +17,12 @@
       "type": "mcq",
       "question": "What prints, given a classroom that genuinely has 2 students already saved in the database?",
       "code": "var classroom = await context.Classrooms.FirstAsync(c => c.Name == \"Grade 10A\");\nConsole.WriteLine(classroom.Students.Count);",
-      "options": ["2", "0 — related data isn't loaded automatically without Include", "It throws an exception", "null"],
+      "options": [
+        "2, because the students are saved",
+        "0, because `Include` wasn't used",
+        "It throws an exception on the empty property",
+        "null, because the list was never created"
+      ],
       "answer": 1,
       "explanation": "EF Core does NOT automatically load navigation properties (no automatic lazy loading by default). Without `.Include(c => c.Students)`, the Students collection is simply empty, even though matching rows exist in the database."
     },
@@ -26,8 +31,8 @@
       "question": "What does `.Include(c => c.Students)` do?",
       "options": [
         "Filters classrooms to only ones with students",
-        "Tells EF Core to also load the Students navigation property in the same query",
-        "Adds a new student to the classroom",
+        "Loads the Students in the same query",
+        "Adds a new student to the classroom in memory",
         "Deletes students not matching a condition"
       ],
       "answer": 1,
@@ -37,9 +42,9 @@
       "type": "mcq",
       "question": "You need every Student in a specific classroom, without loading the whole Classroom object. What's a reasonable approach?",
       "options": [
-        "You must always use Include on Classrooms",
-        "Query the Students DbSet directly: `context.Students.Where(s => s.ClassroomId == classroomId).ToListAsync()`",
-        "This is impossible in EF Core",
+        "You must always use Include on Classrooms first",
+        "Query `context.Students` with a `Where`",
+        "This is impossible in EF Core without raw SQL",
         "Load every student in the database, then filter in C#"
       ],
       "answer": 1,

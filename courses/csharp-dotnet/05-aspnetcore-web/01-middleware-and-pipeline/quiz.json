@@ -6,9 +6,9 @@
       "question": "What does `await next();` do inside a middleware?",
       "options": [
         "Ends the request immediately with a 200 OK",
-        "Passes control to the next middleware in the pipeline (or the endpoint, if this is the last one)",
-        "Restarts the pipeline from the beginning",
-        "Logs the request automatically"
+        "Passes control to the next step in the pipeline",
+        "Restarts the pipeline from the first middleware",
+        "Logs the request automatically, then stops there"
       ],
       "answer": 1,
       "explanation": "next is a delegate representing 'the rest of the pipeline.' Calling it hands control onward; code written after `await next()` in your middleware runs later, on the way back out."
@@ -17,10 +17,10 @@
       "type": "mcq",
       "question": "What happens if a middleware never calls `next()`?",
       "options": [
-        "Nothing different happens",
-        "The request short-circuits — nothing further down the pipeline, including the endpoint, ever runs",
-        "It causes an infinite loop",
-        "The app crashes"
+        "Nothing different happens, the endpoint still runs",
+        "The request short-circuits; later steps never run",
+        "It causes an infinite loop in the pipeline",
+        "The app crashes with an unhandled exception"
       ],
       "answer": 1,
       "explanation": "Skipping next() stops the request right there. This is intentional and useful — e.g., authentication middleware short-circuits with a 401 response when the user isn't logged in, never reaching the actual endpoint."
@@ -53,7 +53,12 @@
     {
       "type": "mcq",
       "question": "What tool lets you test a web app by sending it real HTTP requests without starting a real server on a real port?",
-      "options": ["Console.ReadLine simulation", "WebApplicationFactory, which runs the app in memory", "Docker", "There's no way to do this"],
+      "options": [
+        "Console.ReadLine simulation of the requests",
+        "WebApplicationFactory, running the app in memory",
+        "Docker, with a container for each test run",
+        "There's no way to do this without a real port"
+      ],
       "answer": 1,
       "explanation": "WebApplicationFactory<Program> hosts your entire application in memory for the duration of a test, giving you an HttpClient that talks to it directly — no real network, no real port, but genuinely exercising the whole pipeline."
     },

@@ -3,6 +3,8 @@ import { Course, Module, Lesson, Item } from './model';
 import { ProgressStore, Status } from './progress';
 
 export type Node =
+  | { kind: 'continue' }
+  | { kind: 'review' }
   | { kind: 'course'; course: Course }
   | { kind: 'module'; module: Module }
   | { kind: 'lesson'; lesson: Lesson }
@@ -27,42 +29,67 @@ function typeIcon(item: Item, status: Status): vscode.ThemeIcon {
   switch (item.type) {
     case 'lesson': return new vscode.ThemeIcon('book');
     case 'quiz': return new vscode.ThemeIcon('question');
-    case 'exercise': return new vscode.ThemeIcon(status === 'attempted' ? 'beaker' : 'beaker', status === 'attempted' ? new vscode.ThemeColor('testing.iconQueued') : undefined);
+    case 'exercise': return new vscode.ThemeIcon('beaker', status === 'attempted' ? new vscode.ThemeColor('testing.iconQueued') : undefined);
   }
 }
+
+const itemLabel = (item: Item) => (item.type === 'lesson' ? 'Read the lesson' : item.type === 'quiz' ? 'Quiz' : item.title.replace(/^Exercise:\s*/, ''));
 
 export class CourseTree implements vscode.TreeDataProvider<Node> {
   private readonly _onDidChangeTreeData = new vscode.EventEmitter<Node | undefined>();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
-  constructor(private courses: () => Course[], private progress: ProgressStore) {
+  constructor(private courses: () => Course[], private progress: ProgressStore, private upNext: () => Item | undefined) {
     progress.onDidChange(() => this.refresh());
   }
 
   refresh() { this._onDidChangeTreeData.fire(undefined); }
 
   getChildren(node?: Node): Node[] {
-    if (!node) return this.courses().map(course => ({ kind: 'course', course }));
+    if (!node) {
+      const top: Node[] = [];
+      if (this.upNext()) top.push({ kind: 'continue' });
+      if (this.courses().some(c => itemIds(c).some(id => id.endsWith('/quiz') && this.progress.get(id)?.total))) top.push({ kind: 'review' });
+      return [...top, ...this.courses().map(course => ({ kind: 'course', course }) as Node)];
+    }
     switch (node.kind) {
       case 'course': return node.course.modules.map(module => ({ kind: 'module', module }));
       case 'module': return node.module.lessons.map(lesson => ({ kind: 'lesson', lesson }));
       case 'lesson': return node.lesson.items.map(item => ({ kind: 'item', item }));
-      case 'item': return [];
+      default: return [];
     }
   }
 
   getParent(node: Node): Node | undefined {
     switch (node.kind) {
-      case 'course': return undefined;
       case 'module': return { kind: 'course', course: node.module.course };
       case 'lesson': return { kind: 'module', module: node.lesson.module };
       case 'item': return { kind: 'lesson', lesson: node.item.lesson };
+      default: return undefined;
     }
   }
 
   getTreeItem(node: Node): vscode.TreeItem {
     const C = vscode.TreeItemCollapsibleState;
     switch (node.kind) {
+      case 'continue': {
+        const next = this.upNext()!;
+        const t = new vscode.TreeItem('Continue', C.None);
+        t.description = `${next.lesson.title}: ${itemLabel(next)}`;
+        t.tooltip = 'Open the next unfinished step';
+        t.iconPath = new vscode.ThemeIcon('play', new vscode.ThemeColor('testing.iconPassed'));
+        t.command = { command: 'learnLab.continue', title: 'Continue' };
+        return t;
+      }
+      case 'review': {
+        const due = this.progress.dueReviewKeys().length;
+        const t = new vscode.TreeItem('Review', C.None);
+        t.description = due ? `${due} due` : '5 questions';
+        t.tooltip = 'A short round of questions from earlier lessons';
+        t.iconPath = new vscode.ThemeIcon('history');
+        t.command = { command: 'learnLab.review', title: 'Review' };
+        return t;
+      }
       case 'course': {
         const s = this.progress.summary(itemIds(node.course));
         const t = new vscode.TreeItem(node.course.title, C.Expanded);
@@ -74,7 +101,8 @@ export class CourseTree implements vscode.TreeDataProvider<Node> {
       case 'module': {
         const s = this.progress.summary(itemIds(node.module));
         const allDone = s.total > 0 && s.done === s.total;
-        const t = new vscode.TreeItem(node.module.title, allDone ? C.Collapsed : C.Expanded);
+        const here = this.upNext()?.lesson.module.id === node.module.id;
+        const t = new vscode.TreeItem(node.module.title, here ? C.Expanded : C.Collapsed);
         t.description = `${s.done}/${s.total}`;
         t.iconPath = allDone ? statusIcon('done') : new vscode.ThemeIcon('folder-library');
         t.contextValue = 'module';

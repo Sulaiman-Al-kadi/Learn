@@ -6,7 +6,7 @@
       "question": "What's the main advantage of the Options pattern (`IOptions<NotifierSettings>`) over raw `builder.Configuration[\"Notifier:FromAddress\"]` string access?",
       "options": [
         "No real advantage, they're identical",
-        "Strongly-typed access with IntelliSense — a typo'd config key silently leaves a default value rather than being caught, but at least the C# property name itself can't be mistyped without a compile error",
+        "Strongly-typed access to settings",
         "The Options pattern is faster at runtime",
         "Raw string access doesn't work at all in ASP.NET Core"
       ],
@@ -17,10 +17,10 @@
       "type": "mcq",
       "question": "What's the difference between `_logger.LogInformation(\"Sending to \" + to)` and `_logger.LogInformation(\"Sending to {To}\", to)`?",
       "options": [
-        "No difference — both just produce text",
-        "The second keeps 'To' as a separate, named, structured field a logging provider (like Serilog) can capture and query independently — not just baked into a flat string",
-        "The first is faster",
-        "The second doesn't compile"
+        "No difference, both just produce the same text",
+        "The second keeps `To` as a structured field",
+        "The first is faster, so it's the better choice",
+        "The second doesn't compile without a format call"
       ],
       "answer": 1,
       "explanation": "This is structured logging's whole point: `{To}` is a named placeholder the logging framework tracks as its own field (queryable, filterable in log tools), unlike string concatenation which produces only an opaque block of text."
@@ -29,9 +29,9 @@
       "type": "mcq",
       "question": "Why should application code depend on `ILogger<T>` rather than directly calling Serilog's API?",
       "options": [
-        "ILogger<T> is required syntax",
-        "It's the same Dependency Inversion idea from Module 2 — code depends on the logging ABSTRACTION, so the concrete provider (Serilog, or anything else) can be swapped or reconfigured without touching application code",
-        "Serilog doesn't have its own API",
+        "`ILogger<T>` is required syntax for all logging",
+        "So the logging provider can be swapped",
+        "Serilog doesn't have an API of its own",
         "There's no real reason, it's just convention"
       ],
       "answer": 1,
@@ -41,10 +41,10 @@
       "type": "mcq",
       "question": "What does `builder.Services.Configure<NotifierSettings>(builder.Configuration.GetSection(\"Notifier\"))` do?",
       "options": [
-        "Nothing without further setup",
-        "Binds the \"Notifier\" section of appsettings.json to a NotifierSettings instance, made available for injection as IOptions<NotifierSettings>",
+        "Nothing without further setup in each class",
+        "Binds that section to injectable settings",
         "Deletes the Notifier configuration section",
-        "Directly instantiates a Notifier object"
+        "Directly instantiates a Notifier object at startup"
       ],
       "answer": 1,
       "explanation": "This registers the binding: whatever JSON is under the \"Notifier\" key gets mapped onto NotifierSettings' properties, and any class can then receive it via constructor-injected IOptions<NotifierSettings>."

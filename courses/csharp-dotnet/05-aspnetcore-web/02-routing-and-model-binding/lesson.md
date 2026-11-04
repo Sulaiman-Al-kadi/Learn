@@ -8,7 +8,7 @@ Lesson 01's `/echo/{text}` briefly used a route parameter. This lesson covers th
 app.MapGet("/students/{id}", (int id) => $"Student #{id}");
 ```
 
-`{id}` in the route template is a placeholder; the handler's `int id` parameter is matched to it **by name**. ASP.NET Core automatically converts the URL segment's text into an `int` — visiting `/students/abc` (not a valid int) means the route simply **doesn't match at all**, resulting in a 404, before your code ever runs.
+`{id}` in the route template is a placeholder; the handler's `int id` parameter is matched to it **by name**. ASP.NET Core automatically converts the URL segment's text into an `int` — visiting `/students/abc` (not a valid int) fails that conversion and responds **400 Bad Request**, before your code ever runs. Write the route as `/students/{id:int}` and `abc` doesn't match the route at all, which gives a **404** instead.
 
 ## Route constraints — being explicit about the type
 

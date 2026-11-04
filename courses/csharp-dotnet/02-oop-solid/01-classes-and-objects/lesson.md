@@ -92,7 +92,7 @@ This is worth staring at until it clicks — it's the core idea of OOP:
 Dog a = new Dog("Rex", 3);
 Dog b = new Dog("Rex", 3);          // same values, but...
 
-Console.WriteLine(a == b);          // False — classes compare by reference (Module 1 memory notes!)
+Console.WriteLine(a == b);          // False — classes compare by reference (the Module 1 memory lesson!)
 a.Age = 10;
 Console.WriteLine(b.Age);           // 1... unaffected. a and b are separate objects on the heap.
 ```

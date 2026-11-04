@@ -1,0 +1,5 @@
+Original: 100
+Alias: 100
+Copy: 42
+Alias is original: True
+Copy is original: False

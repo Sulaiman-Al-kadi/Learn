@@ -5,9 +5,9 @@
       "type": "mcq",
       "question": "What problem does containerizing an app solve?",
       "options": [
-        "It makes code run faster",
-        "\"Works on my machine\" — a container packages the app with everything it needs, running identically across different machines/environments",
-        "It replaces the need for testing",
+        "It makes code run faster than it would natively",
+        "\"Works on my machine\": it runs the same everywhere",
+        "It replaces the need for testing the app",
         "It automatically fixes bugs in the code"
       ],
       "answer": 1,
@@ -18,8 +18,8 @@
       "question": "Why does the Dockerfile use TWO `FROM` stages (a multi-stage build)?",
       "options": [
         "It's required syntax, always exactly two stages",
-        "The full SDK is needed to COMPILE the app, but only the smaller runtime is needed to RUN it — the final image only ships the runtime + compiled output, not the full SDK",
-        "To run the app twice",
+        "Build with the SDK, ship only the runtime",
+        "To run the app twice and compare results",
         "To create a backup of the source code"
       ],
       "answer": 1,
@@ -29,8 +29,8 @@
       "type": "mcq",
       "question": "What's the difference between `docker build` and `docker run`?",
       "options": [
-        "They do the same thing",
-        "`docker build` creates an image from a Dockerfile; `docker run` starts a container (a running instance) from that image",
+        "They do the same thing with different defaults",
+        "`build` makes an image; `run` starts a container",
         "`docker run` creates the image, `docker build` starts it",
         "Both only work with docker-compose"
       ],
@@ -41,8 +41,8 @@
       "type": "mcq",
       "question": "What does `docker-compose.yml` let you do that a single Dockerfile doesn't?",
       "options": [
-        "Nothing different",
-        "Declare and start MULTIPLE related containers together (e.g. an API and its database) with one command",
+        "Nothing different, it's another Dockerfile format",
+        "Start several related containers with one command",
         "It replaces Dockerfiles entirely",
         "It only works for databases, not APIs"
       ],

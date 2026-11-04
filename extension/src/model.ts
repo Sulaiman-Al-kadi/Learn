@@ -11,7 +11,7 @@ import * as path from 'path';
 //     lesson.md                            -> Lesson item
 //     quiz.json                            -> Quiz item
 //     exercise*/                           -> Exercise item(s)
-//         meta.json  { title?, check: "output"|"test", student: ["Program.cs"], input?, expected? }
+//         meta.json  { title?, check: "output"|"test", student: ["Program.cs"], input?, expected?, minTests? }
 //         starter/   copies of student files (for Reset)
 //         solution/  reference solution     (for Show Solution)
 //         hints.md   "## Hint 1" ... sections
@@ -60,6 +60,7 @@ export interface ExerciseItem extends ItemBase {
   inputFile?: string;     // stdin for output mode
   expectedFile?: string;  // expected stdout for output mode
   hintsFile?: string;
+  minTests?: number;      // test mode: fewest tests that count (for write-your-own-tests exercises)
   solutionDir?: string;
   starterDir?: string;
 }
@@ -110,7 +111,7 @@ function loadModule(dir: string, id: string, course: Course): Module {
   return mod;
 }
 
-interface ExerciseMeta { title?: string; check?: 'output' | 'test'; student?: string[]; input?: string; expected?: string; }
+interface ExerciseMeta { title?: string; check?: 'output' | 'test'; student?: string[]; input?: string; expected?: string; minTests?: number; }
 
 function loadLesson(dir: string, id: string, module: Module): Lesson {
   const meta = readJson<{ title?: string }>(path.join(dir, 'lesson.json'), {});
@@ -142,6 +143,7 @@ function loadLesson(dir: string, id: string, module: Module): Lesson {
       inputFile: m.input ? path.join(exDir, m.input) : has('input.txt'),
       expectedFile: m.expected ? path.join(exDir, m.expected) : has('expected.txt'),
       hintsFile: has('hints.md'),
+      minTests: m.minTests,
       solutionDir: has('solution'),
       starterDir: has('starter'),
     });
