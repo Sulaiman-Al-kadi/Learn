@@ -14,8 +14,15 @@ if (Test-Tool 'dotnet') {
 } else {
     $missing += '.NET 10 SDK: https://dotnet.microsoft.com/download/dotnet/10.0'
 }
-if (-not (Test-Tool 'node')) { $missing += 'Node.js 18 or newer: https://nodejs.org' }
+if (Test-Tool 'node') {
+    if ([version]((& node --version).TrimStart('v')) -lt [version]'20.18.0') { $missing += 'Node.js 20.18 or newer (packaging crashes on older versions): https://nodejs.org' }
+} else {
+    $missing += 'Node.js 20.18 or newer: https://nodejs.org'
+}
 if (-not (Test-Tool 'code')) { $missing += "VS Code: https://code.visualstudio.com (if it's installed, reinstall with 'Add to PATH' ticked)" }
+
+# EF Core and ASP.NET Core exercises hit the 260-character path limit from deep folders.
+if ($root.Length -gt 75) { $missing += "A shorter folder path. This one is $($root.Length) characters and must be under 75, so clone somewhere like C:\src\Learn" }
 
 if ($missing.Count -gt 0) {
     Write-Host 'Install these, open a new terminal, and run this script again:' -ForegroundColor Yellow
@@ -33,5 +40,5 @@ try {
     Pop-Location
 }
 
-Write-Host 'Done. In VS Code, click the graduation-cap icon in the left bar.' -ForegroundColor Green
+Write-Host 'Done. If VS Code asks whether you trust this folder, choose Yes, then click the graduation-cap icon in the left bar.' -ForegroundColor Green
 if (-not $NoOpen) { & code $root }

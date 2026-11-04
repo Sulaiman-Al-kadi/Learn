@@ -13,7 +13,13 @@ if command -v dotnet >/dev/null 2>&1; then
 else
   missing+=(".NET 10 SDK: https://dotnet.microsoft.com/download/dotnet/10.0")
 fi
-command -v node >/dev/null 2>&1 || missing+=("Node.js 18 or newer: https://nodejs.org")
+if command -v node >/dev/null 2>&1; then
+  if ! node -e 'const [a,b]=process.versions.node.split(".").map(Number);process.exit(a>20||(a===20&&b>=18)?0:1)'; then
+    missing+=("Node.js 20.18 or newer (packaging crashes on older versions): https://nodejs.org")
+  fi
+else
+  missing+=("Node.js 20.18 or newer: https://nodejs.org")
+fi
 command -v code >/dev/null 2>&1 || missing+=("VS Code: https://code.visualstudio.com (then run 'Shell Command: Install code command in PATH')")
 
 if [ "${#missing[@]}" -gt 0 ]; then
@@ -25,5 +31,5 @@ fi
 echo "Building and installing the Learn Lab extension. This takes about a minute..."
 (cd "$root/extension" && npm run setup --silent)
 
-echo "Done. In VS Code, click the graduation-cap icon in the left bar."
+echo "Done. If VS Code asks whether you trust this folder, choose Yes, then click the graduation-cap icon in the left bar."
 if [ -z "${NO_OPEN:-}" ]; then code "$root"; fi

@@ -192,8 +192,13 @@ export class DotnetRunner implements Runner {
     if (!totalLine) {
       // A genuine run always prints "Total tests: n". No such line at all (e.g. zero [Fact]s discovered)
       // must never read as a pass, regardless of exit code.
-      const other = out.split('\n').find(l => /\berror\b/i.test(l))?.trim();
-      return { passed: false, summary: other ? other.slice(0, 200) : 'No tests were found — write at least one [Fact].', details: out };
+      // Restore/MSBuild errors (path too long, locked files) also end here, so report those as they are.
+      const toolError = out.split('\n').find(l => /:\s*error(\s+[A-Z]+\d+)?\s*:/.test(l));
+      if (toolError) {
+        const msg = toolError.replace(/^.*?:\s*error(\s+[A-Z]+\d+)?\s*:\s*/, '').replace(/\s*\[[^\]]*\]\s*$/, '').trim();
+        return { passed: false, summary: `Build failed before any test ran — ${msg}`, details: out };
+      }
+      return { passed: false, summary: 'No tests were found — write at least one [Fact].', details: out };
     }
     const total = Number(totalLine[1]);
     const passed = Number(out.match(/^\s*Passed:\s*(\d+)/m)?.[1] ?? 0);
